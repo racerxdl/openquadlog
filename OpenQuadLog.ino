@@ -12,17 +12,20 @@
 
 #include <ctype.h>
 #include "SoftwareSerial.h"
-SoftwareSerial mySerial(10, 11, true); // RX, TX
+#include "FrSky.h"
+#include "nazagps.h"
+
+SoftwareSerial FrSkySerial(10, 11, true); // RX, TX
+
+uint8_t buffer[64];
 
 void setup() {
-  digitalWrite(13,HIGH);     // turn on debugging LED
-  Serial.begin(9600); 
-  mySerial.begin(9600);
+	digitalWrite(13,HIGH);     		// turn on debugging LED
+	Serial.begin(115200); 			//	Naza GPS Port
+	FrSkySerial.begin(9600);		//	FrSky Serial Port
 }
 
-void loop()
-{
-  if (mySerial.available())
-    Serial.write(mySerial.read());
+void loop()	{
+
 }
 

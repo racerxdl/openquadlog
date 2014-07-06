@@ -37,8 +37,8 @@ private:
 	float course			=	0;
 	DateTime time;
 
-	uint16_t voltage		=	0;	//	0.5V Steps. 0 to 48V
-	uint16_t current		=	0;  //  0.1A Steps. 0 to 100V
+	uint16_t voltage		=	0;	// * 10
+	uint16_t current		=	0; 	//	* 10
 
 	uint16_t acc[3]			=	{0,0,0};
 
@@ -80,9 +80,24 @@ private:
 	};
 
 public:
+	/**
+	 * Writes the internal buffer to the following serial port.
+	 */
 	void WriteBuffer(SoftwareSerial&);
+
+	/**
+	 * Updates the internal data with Naza GPS object
+	 */
 	void UpdateDataWithNaza(NazaGPS &);
+
+	/**
+	 * Adds an Data ID to the internal buffer
+	 */
 	void AddToBuffer(FrSkyID);
+
+	/**
+	 * Clears internal buffer
+	 */
 	void ClearBuffer();
 
 	/**
@@ -124,7 +139,14 @@ public:
 	 */
 	void SendFrame3(SoftwareSerial &);	//	5s
 
+	/**
+	 * Returns the LSB from the current short
+	 */
 	static inline uint8_t lsb(uint16_t value)	{  return ((uint8_t) ((value) & 0xff));	}
+
+	/**
+	 * Returns the MSB from current short
+	 */
 	static inline uint8_t msb(uint16_t value)	{  return ((uint8_t) ((value) >> 8));	}
 };
 

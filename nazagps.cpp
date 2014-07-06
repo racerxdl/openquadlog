@@ -10,11 +10,48 @@
 **/
 
 #include "nazagps.h"
+extern HardwareSerial Serial;
+void NazaGPS::CheckData()	{
+	if(Serial.available())	{
+		digitalWrite(CHKSUM_ERROR_PIN, LOW);
+		digitalWrite(PACKET_OK_PIN, LOW);
+		if(buffpos < 2)		{
+			buffer[buffpos] = Serial.read();
+			buffpos ++;
+		}else{
+			if(buffer[0] == 0x55 && buffer[1] == 0xAA)	{
+				if(buffpos < 4)	{	//	We need 4 bytes. Head + ID + Size
+					buffer[buffpos] = Serial.read();
+					buffpos ++;
+				}else{
+					payloadsize = buffer[3];			//	Size is the 4th byte
+					buffer[buffpos] = Serial.read();
+					buffpos ++;
+					if(buffpos == payloadsize+6)	{	//	Ok, so we have all data
+						CalcChecksum();
+						if(CompareChecksum(&buffer[buffpos-2]))		{	// Checksum OK
+							DecodeMessage(&buffer[4], buffer[2], buffer[3]);
+							digitalWrite(PACKET_OK_PIN, HIGH);
+						}else{	//	Invalid Checksum. Discard all data.
+							buffpos = 0;
+							digitalWrite(CHKSUM_ERROR_PIN, HIGH);
+						}
+					}
+				}
+			}else{
+				// Wrong head, lets clean and restart
+				buffpos = 0;
+				buffer[buffpos] = Serial.read();
+				buffpos++;
+			}
+		}
+	}
+}
 
-void NazaGPS::DecodeMessage(char *data, char id, char size)	{
+void NazaGPS::DecodeMessage(uint8_t *data, uint8_t id, uint8_t size)	{
 	switch(id)	{
 		case MessageType::GPS:
-			char xormask = data[55];							//	This byte isnt xored, so we can use as mask. Its always 0
+			uint8_t xormask = data[55];							//	This byte isnt xored, so we can use as mask. Its always 0
 			uint16_t sequence = *((uint16_t *) (&data[56])); 	//	Sequence Number is a short at position 56. Not xored
 			numSat = data[48];									//	Number of satelites is also not xored
 
@@ -44,12 +81,12 @@ void NazaGPS::DecodeMessage(char *data, char id, char size)	{
 			north_dop			=	UInt16Val(&data[44]);
 			east_dop			=	UInt16Val(&data[46]);
 
-			fixtype				=	data[50];
-			fixstatus			=	data[52];
+			fix					=	data[50];
+			FixStatus			=	data[52];
 
 		break;
 		case MessageType::MAG:
-			char xormask = data[5];
+			uint8_t xormask = data[5];
 			for(int i=0;i<size;i++)
 				if(i!=5)	data[i] ^= xormask;
 
@@ -62,10 +99,11 @@ void NazaGPS::DecodeMessage(char *data, char id, char size)	{
 
 		break;
 		case MessageType::FIRM:
-			sprintf(hardware_version, "%x.%x.%x.%x", data[11], data[10], data[9], data[8]);
-			sprintf(software_version, "%x.%x.%x.%x", data[7], data[6], data[5], data[4]);
+			sprintf((char *)hardware_version, "%x.%x.%x.%x", data[11], data[10], data[9], data[8]);
+			sprintf((char *)software_version, "%x.%x.%x.%x", data[7], data[6], data[5], data[4]);
 		break;
 		default:
 			// Invalid Message: TODO
+			break;
 	}
 }
