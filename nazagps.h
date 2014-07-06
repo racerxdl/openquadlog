@@ -9,18 +9,20 @@
       By: Lucas Teske
 **/
 
+#include <stdint.h>
+#include "DateTime.h"
+
 #ifndef NAZAGPS_H
 #define NAZAGPS_H
 
-#include "DateTime.h"
 
 class	NazaGPS	{
 
 private:
 	static inline uint32_t UInt32Val(char *data)	{	return *((uint32_t *) (data));	};
 	static inline uint16_t UInt16Val(char *data)	{	return *((uint16_t *) (data));	};
-	static inline int32_t  Int32Val(char *data)		{	return *((int32_t *)  (data));	};
-	static inline int16_t  Int16Val(char *data)		{	return *((int16_t *)  (data));	};
+	static inline int32_t  Int32Val (char *data)	{	return *((int32_t *)  (data));	};
+	static inline int16_t  Int16Val (char *data)	{	return *((int16_t *)  (data));	};
 
 public:
 	enum FixType	{
@@ -43,7 +45,7 @@ public:
 	void DecodeMessage(char *, char, char);
 	char GenMagMask(char);
 
-	DateTime time();
+	DateTime time;
 
 	char numSat 						= 	0;
 	int32_t latitude 					= 	0;	//	* 10^7
@@ -74,6 +76,7 @@ public:
 	uint16_t MagY						=	0;
 	uint16_t MagZ						=	0;
 	float MagHead						=	0;
+	float GPSHead						=	0;
 	char *hardware_version;
 	char *software_version;
 

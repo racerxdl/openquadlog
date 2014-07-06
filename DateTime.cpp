@@ -13,21 +13,21 @@
 
 DateTime::DateTime()	{
 	seconds = 0;
-	minutes = 0;
-	hours = 0;
+	minute = 0;
+	hour = 0;
 	day = 0;
 	month = 0;
 	year = 0;
 }
 
 DateTime::DateTime(uint32_t data)	{
-	FromNazaString(data);
+	FromNazaInt(data);
 }
 
 void DateTime::FromNazaInt(uint32_t data)	{
 	seconds =   (data & 0x3F        )   >>  0;
-	minutes =   (data & 0xFC0       )   >>  6;
-	hours   =   (data & 0xF000      )   >>  12;
+	minute  =   (data & 0xFC0       )   >>  6;
+	hour    =   (data & 0xF000      )   >>  12;
 	day     =   (data & 0x1F0000    )   >>  16;
 	month   =   (data & 0x1E00000   )   >>  21;
 	year    =   (data & 0xFE000000  )   >>  25;

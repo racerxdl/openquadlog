@@ -37,6 +37,8 @@ void NazaGPS::DecodeMessage(char *data, char id, char size)	{
 			ground_speed		= 	sqrt(velN * velN + velE * velE);
 			flight_speed		= 	sqrt(velN * velN + velE * velE + velD * velD);
 
+			GPSHead = -atan2(velN, velE) * 180.0 / M_PI;
+
 			position_dop		=	UInt16Val(&data[40]);
 			vertical_dop		=	UInt16Val(&data[42]);
 			north_dop			=	UInt16Val(&data[44]);
