@@ -72,7 +72,7 @@ public:
 		software_version = new uint8_t[12];
 	};
 	void DecodeMessage(uint8_t *, uint8_t, uint8_t);
-	void CheckData();
+	uint8_t CheckData();
 	uint8_t GenMagMask(uint8_t);
 
 	DateTime time;

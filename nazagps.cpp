@@ -11,7 +11,7 @@
 
 #include "nazagps.h"
 extern HardwareSerial Serial;
-void NazaGPS::CheckData()	{
+uint8_t NazaGPS::CheckData()	{
 	if(Serial.available())	{
 		digitalWrite(CHKSUM_ERROR_PIN, LOW);
 		digitalWrite(PACKET_OK_PIN, LOW);
@@ -32,6 +32,7 @@ void NazaGPS::CheckData()	{
 						if(CompareChecksum(&buffer[buffpos-2]))		{	// Checksum OK
 							DecodeMessage(&buffer[4], buffer[2], buffer[3]);
 							digitalWrite(PACKET_OK_PIN, HIGH);
+							return 1;
 						}else{	//	Invalid Checksum. Discard all data.
 							buffpos = 0;
 							digitalWrite(CHKSUM_ERROR_PIN, HIGH);
@@ -46,6 +47,7 @@ void NazaGPS::CheckData()	{
 			}
 		}
 	}
+	return 0;
 }
 
 void NazaGPS::DecodeMessage(uint8_t *data, uint8_t id, uint8_t size)	{

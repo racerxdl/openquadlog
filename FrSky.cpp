@@ -12,6 +12,21 @@
 #include "FrSky.h"
 #include "nazagps.h"
 
+void FrSky::CheckData(SoftwareSerial &ser)	{
+	if(lastframe1+FRAME1_TIME < millis())	{
+		SendFrame1(ser);
+		lastframe1 = millis();
+	}
+	if(lastframe2+FRAME2_TIME < millis())	{
+		SendFrame2(ser);
+		lastframe2 = millis();
+	}
+	if(lastframe3+FRAME3_TIME < millis())	{
+		SendFrame3(ser);
+		lastframe3 = millis();
+	}
+}
+
 void FrSky::ClearBuffer()	{
 	for(int i=0;i<64;i++)
 		buffer[i] = 0;

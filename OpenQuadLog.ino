@@ -15,8 +15,9 @@
 #include "FrSky.h"
 #include "nazagps.h"
 
-SoftwareSerial FrSkySerial(10, 11, true); // RX, TX
-
+SoftwareSerial frskyserial(10, 11, true); // RX, TX
+NazaGPS naza;
+FrSky frsky;
 uint8_t buffer[64];
 
 void setup() {
@@ -26,6 +27,8 @@ void setup() {
 }
 
 void loop()	{
-
+	if(naza.CheckData())	
+		frsky.UpdateDataWithNaza(naza);
+	frsky.CheckData(frskyserial);
 }
 

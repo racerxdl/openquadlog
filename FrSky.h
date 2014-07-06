@@ -9,13 +9,16 @@
       By: Lucas Teske
 **/
 
+#include <SoftwareSerial.h>
+#include "nazagps.h"
+#include "DateTime.h"
 
 #ifndef FRSKY_H
 #define FRSKY_H
 
-#include <SoftwareSerial.h>
-#include "nazagps.h"
-#include "DateTime.h"
+#define FRAME1_TIME 200
+#define FRAME2_TIME 1000
+#define FRAME3_TIME 5000
 
 class FrSky	{
 private:
@@ -44,6 +47,10 @@ private:
 
 	char *buffer			=	new char[64];
 	uint8_t buffsize		=	0;
+
+	uint32_t lastframe1		=	0;
+	uint32_t lastframe2		=	0;
+	uint32_t lastframe3		=	0;
 
 	enum FrSkyID	{
 		GPSALT         =	0x1,
@@ -80,6 +87,18 @@ private:
 	};
 
 public:
+
+	FrSky()	{
+		// Lets set the current time to frames
+		lastframe1 = millis();
+		lastframe2 = millis();
+		lastframe3 = millis();
+	}
+	/**
+	 * Checks if any frame needs to be sent
+	 */
+	void CheckData(SoftwareSerial &);
+
 	/**
 	 * Writes the internal buffer to the following serial port.
 	 */
