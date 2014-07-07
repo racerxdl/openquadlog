@@ -12,17 +12,71 @@
 #include "FrSky.h"
 
 void FrSky::CheckData(SoftwareSerial &ser)	{
+	/** Checks Frame 1 **/
 	if(lastframe1+FRAME1_TIME < millis())	{
 		SendFrame1(ser);
 		lastframe1 = millis();
 	}
+
+	/** Checks Frame 2 **/
 	if(lastframe2+FRAME2_TIME < millis())	{
 		SendFrame2(ser);
 		lastframe2 = millis();
 	}
+
+	/** Checks Frame 3 **/
 	if(lastframe3+FRAME3_TIME < millis())	{
 		SendFrame3(ser);
 		lastframe3 = millis();
+	}
+
+	/** Checks for FrSky sending Telemetry Info **/
+	if(ser.available())	{
+		inbuffer[inbuffpos] = ser.read();		//	Read the byte
+		if(xornext)	{							//	Check if byte is stuffed
+			inbuffer[inbuffpos] ^= 0x20;
+			xornext = 0;
+		}else if(inbuffer[inbuffpos] == 0x7D)	//	Check if the next byte is stuffed, if so we discard current one.
+			xornext = 1;
+		else									//	If not, just get to next position
+			inbuffpos++;
+
+		if(inbuffer[0] == 0x7E)	{				//	We have a valid start
+			if(inbuffpos == 11)	{				//	Lets see if we have all bytes
+				switch(inbuffer[1])	{
+				case 0xFC:						//	(Alarm1)	TAnalog 1  - GreaterThan /LessThan - AlarmLevel
+					A1T_1 	= 	inbuffer[2];
+					A1G_1 	= 	inbuffer[3];
+					A1L_1 	= 	inbuffer[4];
+					break;
+				case 0xFB:						//	(Alarm2)	TAnalog 1  - GreaterThan /LessThan - AlarmLevel
+					A1T_2 	= 	inbuffer[2];
+					A1G_2 	= 	inbuffer[3];
+					A1L_2 	= 	inbuffer[4];
+					break;
+				case 0xFA:						//	(Alarm1)	TAnalog 2  - GreaterThan /LessThan - AlarmLevel
+					A2T_1 	= 	inbuffer[2];
+					A2G_1 	= 	inbuffer[3];
+					A2L_1 	= 	inbuffer[4];
+					break;
+				case 0xF9:						//	(Alarm2)	TAnalog 2  - GreaterThan /LessThan - AlarmLevel
+					A2T_2 	= 	inbuffer[2];
+					A2G_2 	= 	inbuffer[3];
+					A2L_2 	= 	inbuffer[4];
+					break;
+				case 0xFE:						//	(Data)		VAnalog 1  - VAnalog 2             - Link Quality
+					A1		=	inbuffer[2];
+					A2		=	inbuffer[3];
+					RSSI	=	inbuffer[4];
+					break;
+				case 0xFD:						//	User bytes on 4 to 9, size on byte 3
+												//	TODO: Dunno if we need something here o.O
+					break;
+				}
+				inbuffpos 	= 	0;
+			}
+		}else									//	We dont have a valid start
+			inbuffpos 		= 	0;
 	}
 }
 
@@ -102,10 +156,11 @@ void FrSky::SendFrame3(SoftwareSerial &ser)	{
 }
 
 void FrSky::AddToBuffer(FrSkyID id)	{
+	int k,d;
 	switch(id)	{
 	case GPSALT:
-		int k = (gps_altitude/1e3);
-		int d = (gps_altitude - (k*1e3));
+		k = (gps_altitude/1e3);
+		d = (gps_altitude - (k*1e3));
 
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = GPSALT;
@@ -149,8 +204,8 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		break;
 	case INDVOLT:	/** TODO **/ break;
 	case ALTITUDE:
-		int k = (altitude/1e3);
-		int d = (altitude - (k*1e3));
+		k = (altitude/1e3);
+		d = (altitude - (k*1e3));
 
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = ALTITUDE;
@@ -165,8 +220,8 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		buffsize += 8;
 		break;
 	case GPSSPEED:
-		int k = (gps_speed/1e2);
-		int d = (gps_speed - (k*1e2));
+		k = (gps_speed/1e2);
+		d = (gps_speed - (k*1e2));
 
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = GPSSPEED;
@@ -181,8 +236,8 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		buffsize += 8;
 		break;
 	case LONGITUDE:
-		int k = (longitude/1e7);
-		int d = (longitude - (k*1e7));
+		k = (longitude/1e7);
+		d = (longitude - (k*1e7));
 
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = LONGITUDE;
@@ -203,8 +258,8 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		buffsize += 12;
 		break;
 	case LATITUDE:
-		int k = (latitude/1e7);
-		int d = (latitude - (k*1e7));
+		k = (latitude/1e7);
+		d = (latitude - (k*1e7));
 
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = LATITUDE;
@@ -224,8 +279,8 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		buffsize += 12;
 		break;
 	case COURSE:
-		int k = (int)(course);
-		int d = (course - k)*1e3;
+		k = (int)(course);
+		d = (course - k)*1e3;
 
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = COURSE;

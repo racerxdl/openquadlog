@@ -45,12 +45,16 @@ private:
 
 	uint16_t acc[3]			=	{0,0,0};
 
-	char *buffer			=	new char[64];
+	uint8_t *buffer			=	new uint8_t[64];
 	uint8_t buffsize		=	0;
 
 	uint32_t lastframe1		=	0;
 	uint32_t lastframe2		=	0;
 	uint32_t lastframe3		=	0;
+
+	uint8_t inbuffer[12];
+	uint8_t inbuffpos		=	0;
+	uint8_t xornext			=	0;
 
 	enum FrSkyID	{
 		GPSALT         =	0x1,
@@ -87,6 +91,27 @@ private:
 	};
 
 public:
+
+	uint8_t RSSI	=	0;		//	Receiver Signal
+	uint8_t A1		=	0;		//	Analog Input 1 Value
+	uint8_t A2		=	0;		//	Analog Input 2 Value
+
+	/** Alarms **/
+	uint8_t A1T_1		=	0;	//	Alarm 1 - Analog Input 1 Threshold
+	uint8_t A1G_1		=	0;	//	Alarm 1 - Analog Input 1 Greater Than(1) or Lesser Than (2)
+	uint8_t A1L_1		=	0;	//	Alarm 1 - Analog Input 1 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
+	uint8_t A1T_2		=	0;	//	Alarm 2 - Analog Input 1 Threshold
+	uint8_t A1G_2		=	0;	//	Alarm 2 - Analog Input 1 Greater Than(1) or Lesser Than (2)
+	uint8_t A1L_2		=	0;	//	Alarm 2 - Analog Input 1 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
+
+	uint8_t A2T_1		=	0;	//	Alarm 1 - Analog Input 2 Threshold
+	uint8_t A2G_1		=	0;	//	Alarm 1 - Analog Input 2 Greater Than(1) or Lesser Than (2)
+	uint8_t A2L_1		=	0;	//	Alarm 1 - Analog Input 2 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
+	uint8_t A2T_2		=	0;	//	Alarm 2 - Analog Input 2 Threshold
+	uint8_t A2G_2		=	0;	//	Alarm 2 - Analog Input 2 Greater Than(1) or Lesser Than (2)
+	uint8_t A2L_2		=	0;	//	Alarm 2 - Analog Input 2 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
+
+
 
 	FrSky()	{
 		// Lets set the current time to frames

@@ -55,10 +55,12 @@ uint8_t NazaGPS::CheckData()	{
 }
 
 void NazaGPS::DecodeMessage(uint8_t *data, uint8_t id, uint8_t size)	{
+	uint8_t xormask;
+	uint16_t sequence;
 	switch(id)	{
-		case MessageType::GPS:
-			uint8_t xormask = data[55];							//	This byte isnt xored, so we can use as mask. Its always 0
-			uint16_t sequence = *((uint16_t *) (&data[56])); 	//	Sequence Number is a short at position 56. Not xored
+		case GPS:
+			xormask = data[55];									//	This byte isnt xored, so we can use as mask. Its always 0
+			sequence = *((uint16_t *) (&data[56])); 			//	Sequence Number is a short at position 56. Not xored
 			numSat = data[48];									//	Number of satelites is also not xored
 
 			for(int i=0;i<size;i++)
@@ -87,12 +89,12 @@ void NazaGPS::DecodeMessage(uint8_t *data, uint8_t id, uint8_t size)	{
 			north_dop			=	UInt16Val(&data[44]);
 			east_dop			=	UInt16Val(&data[46]);
 
-			fix					=	data[50];
+			fix					=	(FixType)data[50];
 			FixStatus			=	data[52];
 
 		break;
-		case MessageType::MAG:
-			uint8_t xormask = data[5];
+		case MAG:
+			xormask = data[5];
 			for(int i=0;i<size;i++)
 				if(i!=5)	data[i] ^= xormask;
 
@@ -104,7 +106,7 @@ void NazaGPS::DecodeMessage(uint8_t *data, uint8_t id, uint8_t size)	{
 			if (MagHead < 0.0) MagHead += 360.0;
 
 		break;
-		case MessageType::FIRM:
+		case FIRM:
 			sprintf((char *)hardware_version, "%x.%x.%x.%x", data[11], data[10], data[9], data[8]);
 			sprintf((char *)software_version, "%x.%x.%x.%x", data[7], data[6], data[5], data[4]);
 		break;

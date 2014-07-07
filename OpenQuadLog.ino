@@ -23,7 +23,7 @@ uint8_t buffer[64];
 void setup() {
 	digitalWrite(13,HIGH);     		// turn on debugging LED
 	Serial.begin(115200); 			//	Naza GPS Port
-	FrSkySerial.begin(9600);		//	FrSky Serial Port
+	frskyserial.begin(9600);		//	FrSky Serial Port
 }
 
 void loop()	{
