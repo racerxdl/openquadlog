@@ -46,6 +46,7 @@ private:
 	uint16_t acc[3]			=	{0,0,0};
 
 	uint8_t *buffer			=	new uint8_t[64];
+
 	uint8_t buffsize		=	0;
 
 	uint32_t lastframe1		=	0;

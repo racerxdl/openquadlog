@@ -78,6 +78,55 @@ void FrSky::CheckData(SoftwareSerial &ser)	{
 		}else									//	We dont have a valid start
 			inbuffpos 		= 	0;
 	}
+
+	/** Checks for FrSky sending Telemetry Info **/
+	if(ser.available())	{
+		inbuffer[inbuffpos] = ser.read();		//	Read the byte
+		if(xornext)	{							//	Check if byte is stuffed
+			inbuffer[inbuffpos] ^= 0x20;
+			xornext = 0;
+		}else if(inbuffer[inbuffpos] == 0x7D)	//	Check if the next byte is stuffed, if so we discard current one.
+			xornext = 1;
+		else									//	If not, just get to next position
+			inbuffpos++;
+
+		if(inbuffer[0] == 0x7E)	{				//	We have a valid start
+			if(inbuffpos == 11)	{				//	Lets see if we have all bytes
+				switch(inbuffer[1])	{
+				case 0xFC:						//	(Alarm1)	TAnalog 1  - GreaterThan /LessThan - AlarmLevel
+					A1T_1 	= 	inbuffer[2];
+					A1G_1 	= 	inbuffer[3];
+					A1L_1 	= 	inbuffer[4];
+					break;
+				case 0xFB:						//	(Alarm2)	TAnalog 1  - GreaterThan /LessThan - AlarmLevel
+					A1T_2 	= 	inbuffer[2];
+					A1G_2 	= 	inbuffer[3];
+					A1L_2 	= 	inbuffer[4];
+					break;
+				case 0xFA:						//	(Alarm1)	TAnalog 2  - GreaterThan /LessThan - AlarmLevel
+					A2T_1 	= 	inbuffer[2];
+					A2G_1 	= 	inbuffer[3];
+					A2L_1 	= 	inbuffer[4];
+					break;
+				case 0xF9:						//	(Alarm2)	TAnalog 2  - GreaterThan /LessThan - AlarmLevel
+					A2T_2 	= 	inbuffer[2];
+					A2G_2 	= 	inbuffer[3];
+					A2L_2 	= 	inbuffer[4];
+					break;
+				case 0xFE:						//	(Data)		VAnalog 1  - VAnalog 2             - Link Quality
+					A1		=	inbuffer[2];
+					A2		=	inbuffer[3];
+					RSSI	=	inbuffer[4];
+					break;
+				case 0xFD:						//	User bytes on 4 to 9, size on byte 3
+												//	TODO: Dunno if we need something here o.O
+					break;
+				}
+				inbuffpos 	= 	0;
+			}
+		}else									//	We dont have a valid start
+			inbuffpos 		= 	0;
+	}
 }
 
 void FrSky::ClearBuffer()	{
