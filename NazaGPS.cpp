@@ -9,7 +9,7 @@
       By: Lucas Teske
 **/
 
-#include "nazagps.h"
+#include "NazaGPS.h"
 extern HardwareSerial Serial;
 uint8_t NazaGPS::CheckData()	{
 	if(Serial.available())	{

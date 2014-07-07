@@ -10,7 +10,7 @@
 **/
 
 #include <SoftwareSerial.h>
-#include "nazagps.h"
+#include "NazaGPS.h"
 #include "DateTime.h"
 
 #ifndef FRSKY_H

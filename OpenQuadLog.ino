@@ -13,7 +13,7 @@
 #include <ctype.h>
 #include "SoftwareSerial.h"
 #include "FrSky.h"
-#include "nazagps.h"
+#include "NazaGPS.h"
 
 SoftwareSerial frskyserial(10, 11, true); // RX, TX
 NazaGPS naza;

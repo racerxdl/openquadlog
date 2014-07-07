@@ -10,7 +10,6 @@
 **/
 
 #include "FrSky.h"
-#include "nazagps.h"
 
 void FrSky::CheckData(SoftwareSerial &ser)	{
 	if(lastframe1+FRAME1_TIME < millis())	{
