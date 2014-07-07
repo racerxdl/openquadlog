@@ -13,34 +13,38 @@
 extern HardwareSerial Serial;
 uint8_t NazaGPS::CheckData()	{
 	if(Serial.available())	{
+		/*
+		 *	Resets the current status pin states.
+		 */
 		digitalWrite(CHKSUM_ERROR_PIN, LOW);
 		digitalWrite(PACKET_OK_PIN, LOW);
-		if(buffpos < 2)		{
+
+
+		if(buffpos < 2)		{												//	If we dont have the header bytes, we will just read.
 			buffer[buffpos] = Serial.read();
 			buffpos ++;
 		}else{
-			if(buffer[0] == 0x55 && buffer[1] == 0xAA)	{
-				if(buffpos < 4)	{	//	We need 4 bytes. Head + ID + Size
+			if(buffer[0] == 0x55 && buffer[1] == 0xAA)	{					//	Checks if we have the correct heading
+				if(buffpos < 4)	{											//	We need 4 bytes. Head + ID + Size
 					buffer[buffpos] = Serial.read();
 					buffpos ++;
 				}else{
-					payloadsize = buffer[3];			//	Size is the 4th byte
+					payloadsize = buffer[3];								//	Size is the 4th byte
 					buffer[buffpos] = Serial.read();
 					buffpos ++;
-					if(buffpos == payloadsize+6)	{	//	Ok, so we have all data
-						CalcChecksum();
-						if(CompareChecksum(&buffer[buffpos-2]))		{	// Checksum OK
-							DecodeMessage(&buffer[4], buffer[2], buffer[3]);
+					if(buffpos == payloadsize+6)	{						//	Ok, so we have all data
+						CalcChecksum();										//	Calculate the checksum
+						if(CompareChecksum(&buffer[buffpos-2]))		{		// 	Checksum OK
+							DecodeMessage(&buffer[4], buffer[2], buffer[3]);//	Decode the message and save the data
 							digitalWrite(PACKET_OK_PIN, HIGH);
 							return 1;
-						}else{	//	Invalid Checksum. Discard all data.
+						}else{												//	Invalid Checksum. Discard all data.
 							buffpos = 0;
 							digitalWrite(CHKSUM_ERROR_PIN, HIGH);
 						}
 					}
 				}
-			}else{
-				// Wrong head, lets clean and restart
+			}else{															// Wrong head, lets clean and restart
 				buffpos = 0;
 				buffer[buffpos] = Serial.read();
 				buffpos++;
