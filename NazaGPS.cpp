@@ -12,6 +12,7 @@
 #include "NazaGPS.h"
 extern HardwareSerial Serial;
 uint8_t NazaGPS::CheckData()	{
+#ifdef READ_NAZA
 	if(Serial.available())	{
 		/*
 		 *	Resets the current status pin states.
@@ -51,10 +52,12 @@ uint8_t NazaGPS::CheckData()	{
 			}
 		}
 	}
+#endif
 	return 0;
 }
 
 void NazaGPS::DecodeMessage(uint8_t *data, uint8_t id, uint8_t size)	{
+#ifdef READ_NAZA
 	uint8_t xormask;
 	uint16_t sequence;
 	switch(id)	{
@@ -114,4 +117,5 @@ void NazaGPS::DecodeMessage(uint8_t *data, uint8_t id, uint8_t size)	{
 			// Invalid Message: TODO
 			break;
 	}
+#endif
 }

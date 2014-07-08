@@ -13,7 +13,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <Arduino.h>
-
+#include "config.h"
 #include "DateTime.h"
 
 #ifndef NAZAGPS_H

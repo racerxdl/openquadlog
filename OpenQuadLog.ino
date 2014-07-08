@@ -11,6 +11,7 @@
 
 
 #include <ctype.h>
+#include "SD.h"
 #include "SoftwareSerial.h"
 #include "FrSky.h"
 #include "NazaGPS.h"

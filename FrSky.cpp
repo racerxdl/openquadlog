@@ -12,6 +12,7 @@
 #include "FrSky.h"
 
 void FrSky::CheckData(SoftwareSerial &ser)	{
+#ifdef WRITE_FRSKY
 	/** Checks Frame 1 **/
 	if(lastframe1+FRAME1_TIME < millis())	{
 		SendFrame1(ser);
@@ -29,6 +30,8 @@ void FrSky::CheckData(SoftwareSerial &ser)	{
 		SendFrame3(ser);
 		lastframe3 = millis();
 	}
+#endif
+#ifdef READ_FRSKY
 
 	/** Checks for FrSky sending Telemetry Info **/
 	if(ser.available())	{
@@ -78,55 +81,7 @@ void FrSky::CheckData(SoftwareSerial &ser)	{
 		}else									//	We dont have a valid start
 			inbuffpos 		= 	0;
 	}
-
-	/** Checks for FrSky sending Telemetry Info **/
-	if(ser.available())	{
-		inbuffer[inbuffpos] = ser.read();		//	Read the byte
-		if(xornext)	{							//	Check if byte is stuffed
-			inbuffer[inbuffpos] ^= 0x20;
-			xornext = 0;
-		}else if(inbuffer[inbuffpos] == 0x7D)	//	Check if the next byte is stuffed, if so we discard current one.
-			xornext = 1;
-		else									//	If not, just get to next position
-			inbuffpos++;
-
-		if(inbuffer[0] == 0x7E)	{				//	We have a valid start
-			if(inbuffpos == 11)	{				//	Lets see if we have all bytes
-				switch(inbuffer[1])	{
-				case 0xFC:						//	(Alarm1)	TAnalog 1  - GreaterThan /LessThan - AlarmLevel
-					A1T_1 	= 	inbuffer[2];
-					A1G_1 	= 	inbuffer[3];
-					A1L_1 	= 	inbuffer[4];
-					break;
-				case 0xFB:						//	(Alarm2)	TAnalog 1  - GreaterThan /LessThan - AlarmLevel
-					A1T_2 	= 	inbuffer[2];
-					A1G_2 	= 	inbuffer[3];
-					A1L_2 	= 	inbuffer[4];
-					break;
-				case 0xFA:						//	(Alarm1)	TAnalog 2  - GreaterThan /LessThan - AlarmLevel
-					A2T_1 	= 	inbuffer[2];
-					A2G_1 	= 	inbuffer[3];
-					A2L_1 	= 	inbuffer[4];
-					break;
-				case 0xF9:						//	(Alarm2)	TAnalog 2  - GreaterThan /LessThan - AlarmLevel
-					A2T_2 	= 	inbuffer[2];
-					A2G_2 	= 	inbuffer[3];
-					A2L_2 	= 	inbuffer[4];
-					break;
-				case 0xFE:						//	(Data)		VAnalog 1  - VAnalog 2             - Link Quality
-					A1		=	inbuffer[2];
-					A2		=	inbuffer[3];
-					RSSI	=	inbuffer[4];
-					break;
-				case 0xFD:						//	User bytes on 4 to 9, size on byte 3
-												//	TODO: Dunno if we need something here o.O
-					break;
-				}
-				inbuffpos 	= 	0;
-			}
-		}else									//	We dont have a valid start
-			inbuffpos 		= 	0;
-	}
+#endif
 }
 
 void FrSky::ClearBuffer()	{
@@ -136,6 +91,7 @@ void FrSky::ClearBuffer()	{
 }
 
 void FrSky::WriteBuffer(SoftwareSerial &ser)	{
+#ifdef WRITE_FRSKY
 	int i = 0;
 	while(i<buffsize)	{
 		if(i%4)	{
@@ -157,9 +113,11 @@ void FrSky::WriteBuffer(SoftwareSerial &ser)	{
 		i++;
 	}
 	ClearBuffer();
+#endif
 }
 
 void FrSky::UpdateDataWithNaza(NazaGPS &naza)	{
+#ifdef  READ_NAZA
 	gps_altitude 	= 	naza.altitude;
 	latitude 		= 	naza.latitude;
 	longitude 		= 	naza.longitude;
@@ -169,9 +127,11 @@ void FrSky::UpdateDataWithNaza(NazaGPS &naza)	{
 
 	course 			=	naza.GPSHead;
 	time.FromDateTime(naza.time);
+#endif
 }
 
 void FrSky::SendFrame1(SoftwareSerial &ser)	{
+#ifdef WRITE_FRSKY
 	AddToBuffer(ACCX);
 	AddToBuffer(ACCY);
 	AddToBuffer(ACCZ);
@@ -184,9 +144,11 @@ void FrSky::SendFrame1(SoftwareSerial &ser)	{
 	AddToBuffer(RPM);
 	buffer[buffsize++] = TAIL;
 	WriteBuffer(ser);
+#endif
 }
 
 void FrSky::SendFrame2(SoftwareSerial &ser)	{
+#ifdef WRITE_FRSKY
 	AddToBuffer(COURSE);
 	AddToBuffer(LATITUDE);
 	AddToBuffer(LONGITUDE);
@@ -195,16 +157,20 @@ void FrSky::SendFrame2(SoftwareSerial &ser)	{
 	AddToBuffer(FUEL);
 	buffer[buffsize++] = TAIL;
 	WriteBuffer(ser);
+#endif
 }
 
 void FrSky::SendFrame3(SoftwareSerial &ser)	{
+#ifdef WRITE_FRSKY
 	AddToBuffer(DATE);
 	AddToBuffer(TIME);
 	buffer[buffsize++] = TAIL;
 	WriteBuffer(ser);
+#endif
 }
 
 void FrSky::AddToBuffer(FrSkyID id)	{
+#ifdef WRITE_FRSKY
 	int k,d;
 	switch(id)	{
 	case GPSALT:
@@ -416,4 +382,5 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 
 		break;
 	}
+#endif
 }

@@ -13,6 +13,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <Arduino.h>
+#include "config.h"
+#include "SD.h"
+
 
 #ifndef OQL_H
 #define OQL_H
@@ -35,20 +38,33 @@ private:
 	static const int V2_PIN = A1;
 	static const int S1_PIN = A2;
 	static const int S2_PIN = A3;
+	static const int SD_SEL = 4;	//	SD Chip Select
 
+	String filename;
 public:
 
 	OQL()	{
 		pinMode(S1_PIN, INPUT);
 		pinMode(S2_PIN, INPUT);
+#ifdef USE_SD
+		logen = SD.begin(SD_SEL);
+#endif
 	}
-	float v1	=	0;	//	Voltage Measure
-	float v2	=	0;	//	Current Measure
-	uint8_t s1	=	0;	//	Used as Green Led on NAZA
-	uint8_t s2	=	0;	//	Used as Red Led on NAZA
+
+	float v1		=	0;	//	Voltage Measure
+	float v2		=	0;	//	Current Measure
+	uint8_t s1		=	0;	//	Used as Green Led on NAZA
+	uint8_t s2		=	0;	//	Used as Red Led on NAZA
+
+#ifdef USE_SD
+	uint8_t logen	= 	0;	//	If logging to SD is enabled
+
+	void WriteToLog(String &);
+	void WriteToLog(const char *);
+	void SetFilename();
+#endif
 
 	uint8_t CheckData();
-
 };
 
 #endif

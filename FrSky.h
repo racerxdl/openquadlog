@@ -10,6 +10,7 @@
 **/
 
 #include <SoftwareSerial.h>
+#include "config.h"
 #include "NazaGPS.h"
 #include "DateTime.h"
 
@@ -187,12 +188,12 @@ public:
 	/**
 	 * Returns the LSB from the current short
 	 */
-	static inline uint8_t lsb(uint16_t value)	{  return ((uint8_t) ((value) & 0xff));	}
+	static uint8_t lsb(uint16_t value)	{  return ((uint8_t) ((value) & 0xff));	}
 
 	/**
 	 * Returns the MSB from current short
 	 */
-	static inline uint8_t msb(uint16_t value)	{  return ((uint8_t) ((value) >> 8));	}
+	static uint8_t msb(uint16_t value)	{  return ((uint8_t) ((value) >> 8));	}
 };
 
 #endif
