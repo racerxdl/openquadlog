@@ -9,7 +9,7 @@
       By: Lucas Teske
 **/
 
-#include <HardwareSerial.h>
+
 #include "config.h"
 #include "NazaGPS.h"
 #include "DateTime.h"
@@ -29,7 +29,7 @@
 class FrSky	{
 private:
 
-	uint8_t *buffer			=	new uint8_t[128];
+	uint8_t buffer[128];
 
 	uint8_t buffsize		=	0;
 
@@ -127,18 +127,20 @@ public:
 	FrSky()	{
 		// Lets set the current time to frames
 		lastframe1 = millis();
-		lastframe2 = millis();
-		lastframe3 = millis();
+		lastframe2 = millis()+50;
+		lastframe3 = millis()+100;
+		for(int i=0;i<128;i++)
+			buffer[i] = 0x00;
 	}
 	/**
 	 * Checks if any frame needs to be sent
 	 */
-	void CheckData(HardwareSerial &);
+	void CheckData(SoftwareSerial &);
 
 	/**
 	 * Writes the internal buffer to the following serial port.
 	 */
-	void WriteBuffer(HardwareSerial&);
+	void WriteBuffer(SoftwareSerial&);
 
 	/**
 	 * Updates the internal data with Naza GPS object
@@ -153,7 +155,7 @@ public:
 	/**
 	 * Clears internal buffer
 	 */
-	void ClearBuffer();
+	inline void ClearBuffer();
 
 	/**
 	 * Sends Frame1 Data. This should be done with an 200ms interval
@@ -168,7 +170,7 @@ public:
 	 * 	- Current						[ Divided by 10 ]
 	 * 	- Motor RPM						[ Divided by 60, a.k.a. RPS ]
 	 */
-	void SendFrame1(HardwareSerial &);	//	200ms
+	void SendFrame1(SoftwareSerial &);	//	200ms
 
 	/**
 	 * Sends Frame2 Data. This should be done with an 1s interval
@@ -182,7 +184,7 @@ public:
 	 * 	- Altitude	( From GPS )
 	 * 	- Fuel Level
 	 */
-	void SendFrame2(HardwareSerial &);	//	1s
+	void SendFrame2(SoftwareSerial &);	//	1s
 
 	/**
 	 * Sends Frame3 Data. This should be done with an 5s interval
@@ -192,17 +194,17 @@ public:
 	 * 	- Date
 	 * 	- Time
 	 */
-	void SendFrame3(HardwareSerial &);	//	5s
+	void SendFrame3(SoftwareSerial &);	//	5s
 
 	/**
 	 * Returns the LSB from the current short
 	 */
-	static uint8_t lsb(uint16_t value)	{  return ((uint8_t) ((value) & 0xff));	}
+	static inline uint8_t lsb(uint16_t value)	{  return ((uint8_t) ((value) & 0xff));	}
 
 	/**
 	 * Returns the MSB from current short
 	 */
-	static uint8_t msb(uint16_t value)	{  return ((uint8_t) ((value) >> 8));	}
+	static inline uint8_t msb(uint16_t value)	{  return ((uint8_t) ((value) >> 8));	}
 };
 
 #endif

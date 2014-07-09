@@ -9,19 +9,18 @@
       By: Lucas Teske
 **/
 
+
+#include "config.h"
 #include <stdint.h>
 #include <math.h>
 #include <stdio.h>
 #include <Arduino.h>
-#include "config.h"
 #include "DateTime.h"
 
 #ifndef NAZAGPS_H
 #define NAZAGPS_H
 
-#define CHKSUM_ERROR_PIN -1 //13
-#define PACKET_OK_PIN -1 //14
-
+extern FastSerial Serial1;
 
 class	NazaGPS	{
 
@@ -105,14 +104,21 @@ public:
 	NazaGPS() {
 		hardware_version = new uint8_t[13];
 		software_version = new uint8_t[13];
-		hardware_version[12] = 0x00;
-		software_version[12] = 0x00;
+		for(int i=0;i<13;i++)	{
+			hardware_version[i] = 0x00;
+			software_version[i] = 0x00;
+		}
 	};
 
 	/**
 	 * Decodes the Naza payload
 	 */
 	void DecodeMessage(uint8_t *, uint8_t, uint8_t);
+
+	/**
+	 * Clears the buffer
+	 */
+	void ClearBuffer();
 
 	/**
 	 * Checks if there is any data.

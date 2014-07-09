@@ -9,12 +9,12 @@
       By: Lucas Teske
 **/
 
+#include "config.h"
 #include <stdint.h>
 #include <math.h>
 #include <stdio.h>
 #include <Arduino.h>
 #include "config.h"
-#include "SD.h"
 
 
 #ifndef OQL_H

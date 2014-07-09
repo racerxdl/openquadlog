@@ -11,33 +11,45 @@
 
 #include "FrSky.h"
 
-void FrSky::CheckData(HardwareSerial &ser)	{
+void FrSky::CheckData(SoftwareSerial &ser)	{
 #ifdef WRITE_FRSKY
+	unsigned long ctime = millis();
+
 	/** Checks Frame 1 **/
-	if(lastframe1+FRAME1_TIME < millis())	{
+
+	if(lastframe1+FRAME1_TIME < ctime)	{
+ #ifdef DEBUG_MEGA && DEBUG_MEGA_FRSKY
 		Serial.println("Sending Frame1");
+ #endif
 		SendFrame1(ser);
 		lastframe1 = millis();
 	}
 
 	/** Checks Frame 2 **/
-	if(lastframe2+FRAME2_TIME < millis())	{
+	if(lastframe2+FRAME2_TIME < ctime)	{
+ #ifdef DEBUG_MEGA && DEBUG_MEGA_FRSKY
 		Serial.println("Sending Frame2");
+ #endif
 		SendFrame2(ser);
 		lastframe2 = millis();
 	}
 
 	/** Checks Frame 3 **/
+ #ifdef FRSKY_FRAME3
 	if(lastframe3+FRAME3_TIME < millis())	{
-		Serial.println("Sending Frame3");
+  #ifdef DEBUG_MEGA && DEBUG_MEGA_FRSKY
+ 		Serial.println("Sending Frame3");
+  #endif
 		SendFrame3(ser);
 		lastframe3 = millis();
 	}
+ #endif
 #endif
+
 #ifdef READ_FRSKY
 
 	/** Checks for FrSky sending Telemetry Info **/
-	if(ser.available())	{
+	while(ser.available())	{
 		inbuffer[inbuffpos] = ser.read();		//	Read the byte
 		if(xornext)	{							//	Check if byte is stuffed
 			inbuffer[inbuffpos] ^= 0x20;
@@ -93,7 +105,7 @@ void FrSky::ClearBuffer()	{
 	buffsize = 0;
 }
 
-void FrSky::WriteBuffer(HardwareSerial &ser)	{
+void FrSky::WriteBuffer(SoftwareSerial &ser)	{
 #ifdef WRITE_FRSKY
 	int i = 0;
 	while(i<buffsize)	{
@@ -134,38 +146,46 @@ void FrSky::UpdateDataWithNaza(NazaGPS &naza)	{
 #endif
 }
 
-void FrSky::SendFrame1(HardwareSerial &ser)	{
+void FrSky::SendFrame1(SoftwareSerial &ser)	{
 #ifdef WRITE_FRSKY
+ #ifdef FRSKY_ACC
 	AddToBuffer(ACCX);
 	AddToBuffer(ACCY);
 	AddToBuffer(ACCZ);
+ #endif
 	AddToBuffer(ALTITUDE);
 	AddToBuffer(TEMP1);
 	AddToBuffer(TEMP2);
+ #ifdef FRSKY_CELL
 	AddToBuffer(INDVOLT);
+ #endif
 	AddToBuffer(CURRENT);
 	AddToBuffer(VOLTAGE);
+ #ifdef FRSKY_RPM
 	AddToBuffer(RPM);
+ #endif
 	buffer[buffsize++] = TAIL;
 	WriteBuffer(ser);
 #endif
 }
 
-void FrSky::SendFrame2(HardwareSerial &ser)	{
+void FrSky::SendFrame2(SoftwareSerial &ser)	{
 #ifdef WRITE_FRSKY
 	AddToBuffer(COURSE);
 	AddToBuffer(LATITUDE);
 	AddToBuffer(LONGITUDE);
 	AddToBuffer(GPSSPEED);
 	AddToBuffer(GPSALT);
+#ifdef FRSKY_FUEL
 	AddToBuffer(FUEL);
+#endif
 	buffer[buffsize++] = TAIL;
 	WriteBuffer(ser);
 #endif
 }
 
-void FrSky::SendFrame3(HardwareSerial &ser)	{
-#ifdef WRITE_FRSKY
+void FrSky::SendFrame3(SoftwareSerial &ser)	{
+#ifdef WRITE_FRSKY && FRSKY_FRAME3
 	AddToBuffer(DATE);
 	AddToBuffer(TIME);
 	buffer[buffsize++] = TAIL;
@@ -200,6 +220,7 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		buffer[buffsize+3] = msb(temperature1);
 		buffsize += 4;
 		break;
+ #ifdef FRSKY_RPM
 	case RPM:
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = RPM;
@@ -207,6 +228,8 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		buffer[buffsize+3] = msb(rpm/60);
 		buffsize += 4;
 		break;
+ #endif
+ #ifdef FRSKY_FUEL
 	case FUEL:
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = FUEL;
@@ -214,6 +237,7 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		buffer[buffsize+3] = msb(fuellevel);
 		buffsize += 4;
 		break;
+ #endif
 	case TEMP2:
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = TEMP2;
@@ -221,6 +245,7 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		buffer[buffsize+3] = msb(temperature2);
 		buffsize += 4;
 		break;
+ #ifdef FRSKY_CELL
 	case INDVOLT:	
 	    for(i=0;i<6;i++)    {
 	        if(cell[i] < 10)    //  The cell voltage cannot be that lower, so if it is above 0.1V, we will break the loop.
@@ -233,6 +258,7 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		    buffsize += 4;	
 	    }
 	    break;
+ #endif
 	case ALTITUDE:
 		k = (altitude/1e3);
 		d = (altitude - (k*1e3));
@@ -324,6 +350,7 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 
 		buffsize += 8;
 		break;
+ #ifdef FRSKY_FRAME3
 	case DATE:
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = DATE;
@@ -352,6 +379,8 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		buffer[buffsize+3] = 0;
 		buffsize += 4;
 		break;
+ #endif
+ #ifdef FRSKY_ACC
 	case ACCX:
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = ACCX;
@@ -373,6 +402,7 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 		buffer[buffsize+3] = msb(acc[2]);
 		buffsize += 4;
 		break;
+ #endif
 	case CURRENT:
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = CURRENT;
