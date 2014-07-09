@@ -12,7 +12,7 @@
 #include "NazaGPS.h"
 uint8_t NazaGPS::CheckData()	{
 #ifdef READ_NAZA
-	if(Serial.available())	{
+	if(Serial1.available())	{
 		/*
 		 *	Resets the current status pin states.
 		 */
@@ -21,16 +21,16 @@ uint8_t NazaGPS::CheckData()	{
 
 
 		if(buffpos < 2)		{												//	If we dont have the header bytes, we will just read.
-			buffer[buffpos] = Serial.read();
+			buffer[buffpos] = Serial1.read();
 			buffpos ++;
 		}else{
 			if(buffer[0] == 0x55 && buffer[1] == 0xAA)	{					//	Checks if we have the correct heading
 				if(buffpos < 4)	{											//	We need 4 bytes. Head + ID + Size
-					buffer[buffpos] = Serial.read();
+					buffer[buffpos] = Serial1.read();
 					buffpos ++;
 				}else{
 					payloadsize = buffer[3];								//	Size is the 4th byte
-					buffer[buffpos] = Serial.read();
+					buffer[buffpos] = Serial1.read();
 					buffpos ++;
 					if(buffpos == payloadsize+6)	{						//	Ok, so we have all data
 						CalcChecksum();										//	Calculate the checksum
@@ -47,7 +47,7 @@ uint8_t NazaGPS::CheckData()	{
 				}
 			}else{															// Wrong head, lets clean and restart
 				buffpos = 0;
-				buffer[buffpos] = Serial.read();
+				buffer[buffpos] = Serial1.read();
 				buffpos++;
 			}
 		}

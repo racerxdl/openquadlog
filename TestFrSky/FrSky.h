@@ -21,8 +21,8 @@
 #define FRAME2_TIME 1000
 #define FRAME3_TIME 5000
 
-#define CELL_VMAX_C 159.f	//	The max value at variable
-#define CELL_VMAX_V 508.f	//	The max voltage that this max variable value is
+#define CELL_VMAX_C 159.f
+#define CELL_VMAX_V 508.f
 
 #define CELL_V2C(x) ((uint8_t)(( CELL_VMAX_C * x ) / CELL_VMAX_V))
 
@@ -77,50 +77,50 @@ private:
 
 public:
 
-	uint8_t RSSI			=	0;		//	Receiver Signal
-	uint8_t A1				=	0;		//	Analog Input 1 Value
-	uint8_t A2				=	0;		//	Analog Input 2 Value
+	uint8_t RSSI	=	0;		//	Receiver Signal
+	uint8_t A1		=	0;		//	Analog Input 1 Value
+	uint8_t A2		=	0;		//	Analog Input 2 Value
 
-	int32_t gps_altitude	= 	0;		//	The GPS Altitude
-	int32_t latitude		= 	0;		//	The GPS Latitude
-	int32_t longitude		=   0;		//	The GPS Longitude
+	int32_t gps_altitude	= 	123456;
+	int32_t latitude		= 	1000;
+	int32_t longitude		=   2000;
 
-	int8_t temperature1		= 	0;		//	Temperature 1
-	int8_t temperature2		= 	0;		//	Temperature 2
+	int8_t temperature1		= 	0;
+	int8_t temperature2		= 	0;
 
-	uint16_t rpm			=	0;		//	Motor RPM * Number of blades
-	uint16_t fuellevel		=	0;		//	Fuel Level (in percent)
+	uint16_t rpm			=	3200;
+	uint16_t fuellevel		=	50;
 
-	uint16_t altitude		=	0;		//	Variometer Altitude (or Barometer)
-	uint32_t gps_speed		=	0;		//	GPS Ground Speed (knots)
+	uint16_t altitude		=	654321;
+	uint32_t gps_speed		=	2500;
 
     /**
-     * 6 cells voltages. Multiplied by 100
-     */
-	uint16_t cell[6]	    =	{0,0,0,0,0,0};
+      * Cell Voltage * 100
+      */
+	uint16_t cell[6]	    =	{422,320,0,210,440,500};     
 
-	float course			=	0;		//	GPS Course in Degrees
-	DateTime time;						//	GPS Time
+	float course			=	35;
+	DateTime time;
 
-	uint16_t voltage		=	0;		// 	Battery Voltage * 10
-	uint16_t current		=	0; 	    //	Current * 10
+	uint16_t voltage		=	126;	// * 10
+	uint16_t current		=	0; 	    //	* 10
 
-	uint16_t acc[3]			=	{0,0,0};//	Acelerometer Values
+	uint16_t acc[3]			=	{0,0,0};
 
 	/** Alarms **/
-	uint8_t A1T_1		=	0;			//	Alarm 1 - Analog Input 1 Threshold
-	uint8_t A1G_1		=	0;			//	Alarm 1 - Analog Input 1 Greater Than(1) or Lesser Than (2)
-	uint8_t A1L_1		=	0;			//	Alarm 1 - Analog Input 1 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
-	uint8_t A1T_2		=	0;			//	Alarm 2 - Analog Input 1 Threshold
-	uint8_t A1G_2		=	0;			//	Alarm 2 - Analog Input 1 Greater Than(1) or Lesser Than (2)
-	uint8_t A1L_2		=	0;			//	Alarm 2 - Analog Input 1 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
+	uint8_t A1T_1		=	0;	//	Alarm 1 - Analog Input 1 Threshold
+	uint8_t A1G_1		=	0;	//	Alarm 1 - Analog Input 1 Greater Than(1) or Lesser Than (2)
+	uint8_t A1L_1		=	0;	//	Alarm 1 - Analog Input 1 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
+	uint8_t A1T_2		=	0;	//	Alarm 2 - Analog Input 1 Threshold
+	uint8_t A1G_2		=	0;	//	Alarm 2 - Analog Input 1 Greater Than(1) or Lesser Than (2)
+	uint8_t A1L_2		=	0;	//	Alarm 2 - Analog Input 1 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
 
-	uint8_t A2T_1		=	0;			//	Alarm 1 - Analog Input 2 Threshold
-	uint8_t A2G_1		=	0;			//	Alarm 1 - Analog Input 2 Greater Than(1) or Lesser Than (2)
-	uint8_t A2L_1		=	0;			//	Alarm 1 - Analog Input 2 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
-	uint8_t A2T_2		=	0;			//	Alarm 2 - Analog Input 2 Threshold
-	uint8_t A2G_2		=	0;			//	Alarm 2 - Analog Input 2 Greater Than(1) or Lesser Than (2)
-	uint8_t A2L_2		=	0;			//	Alarm 2 - Analog Input 2 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
+	uint8_t A2T_1		=	0;	//	Alarm 1 - Analog Input 2 Threshold
+	uint8_t A2G_1		=	0;	//	Alarm 1 - Analog Input 2 Greater Than(1) or Lesser Than (2)
+	uint8_t A2L_1		=	0;	//	Alarm 1 - Analog Input 2 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
+	uint8_t A2T_2		=	0;	//	Alarm 2 - Analog Input 2 Threshold
+	uint8_t A2G_2		=	0;	//	Alarm 2 - Analog Input 2 Greater Than(1) or Lesser Than (2)
+	uint8_t A2L_2		=	0;	//	Alarm 2 - Analog Input 2 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
 
 
 

@@ -12,9 +12,9 @@
 #ifndef OQLDEFS
 #define OQLDEFS
 
-//#define USE_SD		//	Use data logging to SD
-//#define LOG_NAZA		//	Log Naza Messages to SD
-//#define LOG_FRSKY		//	Log FrSky Messages to SD
+#define USE_SD			//	Use data logging to SD
+#define LOG_NAZA		//	Log Naza Messages to SD
+#define LOG_FRSKY		//	Log FrSky Messages to SD
 #define READ_FRSKY		//	Read FrSky Messages
 #define WRITE_FRSKY		//	Write data to FrSky
 #define READ_NAZA		//	Read NAZA Messages
