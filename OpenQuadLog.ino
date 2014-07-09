@@ -12,9 +12,12 @@
 #define NOHARDWARESERIAL
 
 #include <FastSerial.h>
+
 FastSerialPort0(Serial);
+
+#ifdef MEGA_MODE
 FastSerialPort1(Serial1);
-//FastSerialPort2(Serial2);
+#endif
 
 #include <ctype.h>
 //#include <SD.h>
@@ -24,24 +27,30 @@ FastSerialPort1(Serial1);
 
 NazaGPS naza;
 FrSky frsky;
-SoftwareSerial frskyport(10,11,true); // RX, TX
+SoftwareSerial frskyport(10,11,true); 	// RX, TX
 
-unsigned long lastFrSkyTime = 0;
+unsigned long lastFrSkyTime = 0;		//	Just to loadoff the mainloop. We only start the FrSky checks every 200ms
+
 void setup() {
-	digitalWrite(13,HIGH);     		// turn on debugging LED
-	Serial.begin(115200);
-	Serial1.begin(115200); 			//	Naza GPS Port
-	Serial.println("HUE");
-	frskyport.begin(9600);			//	FrSky Serial Port
+	Serial.begin(115200);				//	Naza GPS Port on Non-MEGA mode, Debug Port on MEGA Mode
+	#ifdef MEGA_MODE
+		Serial1.begin(115200); 			//	Naza GPS Port
+		#ifdef DEBUG_MEGA
+		Serial.println("OQL Started");	
+		#endif
+	#endif
+	frskyport.begin(9600);				//	FrSky Serial Port
 	lastFrSkyTime = millis();
 }
 
 void loop()	{
-	if(naza.CheckData())	{
+#ifdef MEGA_MODE
+	if(naza.CheckData(Serial1))	{	//	On MEGA Mode, Naza is hooked up on Serial 1
+#else
+	if(naza.CheckData(Serial))	{
+#endif
 		frsky.UpdateDataWithNaza(naza);
 		digitalWrite(13,HIGH);
-		//Serial << "Num Sat: " << naza.numSat << "\n";
-		//Serial << naza.time.day << "/" << naza.time.month << "/" << naza.time.year << " - " << naza.time.hour << ":" << naza.time.minute << ":" << naza.time.seconds << "\n";
 	}
 	if(millis() > (lastFrSkyTime+200)){
 		digitalWrite(13,LOW);

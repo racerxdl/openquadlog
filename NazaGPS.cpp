@@ -17,11 +17,11 @@ void NazaGPS::ClearBuffer()	{
 	buffpos = 0;
 }
 
-uint8_t NazaGPS::CheckData()	{
+uint8_t NazaGPS::CheckData(FastSerial &ser)	{
 #ifdef READ_NAZA
-	while(Serial1.available())	{
-		uint8_t data = Serial1.read();
- 	 	#ifdef DEBUG_MEGA
+	while(ser.available())	{
+		uint8_t data = ser.read();
+ 	 	#ifdef DEBUG_MEGA && MEGA_MODE
 		if(buffpos > 128)
 			Serial.println("BUFFER OVERFLOW");
 
@@ -40,7 +40,7 @@ uint8_t NazaGPS::CheckData()	{
 					buffer[buffpos] = data;
 					buffpos ++;
 					if(payloadsize > 96)	{
-						#ifdef DEBUG_MEGA
+						#ifdef DEBUG_MEGA && MEGA_MODE
 						Serial.println("Corrupt packet!");
 						for(int i=0;i<32;i++)	{
 							Serial.print(buffer[i],HEX);
@@ -56,7 +56,7 @@ uint8_t NazaGPS::CheckData()	{
 						if(CompareChecksum(&buffer[buffpos-2]))		{		// 	Checksum OK
 							DecodeMessage(&buffer[4], buffer[2], buffer[3]);//	Decode the message and save the data
 							ClearBuffer();
-							#ifdef DEBUG_MEGA
+							#ifdef DEBUG_MEGA && MEGA_MODE
 							Serial.println("OK");
 							#endif
 							return 1;
@@ -67,7 +67,7 @@ uint8_t NazaGPS::CheckData()	{
 					}
 				}
 			}else{															// Wrong head, lets clean and restart
-				#ifdef DEBUG_MEGA
+				#ifdef DEBUG_MEGA && MEGA_MODE
 				Serial.println("Wrong head received.");
 				#endif
 				ClearBuffer();

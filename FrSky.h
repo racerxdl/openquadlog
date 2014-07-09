@@ -21,10 +21,12 @@
 #define FRAME2_TIME 1000
 #define FRAME3_TIME 5000
 
-#define CELL_VMAX_C 159.f	//	The max value at variable
-#define CELL_VMAX_V 508.f	//	The max voltage that this max variable value is
+#ifdef FRSKY_CELL
+	#define CELL_VMAX_C 159.f	//	The max value at variable
+	#define CELL_VMAX_V 508.f	//	The max voltage that this max variable value is
 
-#define CELL_V2C(x) ((uint8_t)(( CELL_VMAX_C * x ) / CELL_VMAX_V))
+	#define CELL_V2C(x) ((uint8_t)(( CELL_VMAX_C * x ) / CELL_VMAX_V))
+#endif
 
 class FrSky	{
 private:
@@ -105,9 +107,11 @@ public:
 	uint16_t voltage		=	0;		// 	Battery Voltage * 10
 	uint16_t current		=	0; 	    //	Current * 10
 
+	#ifdef FRSKY_ACC
 	uint16_t acc[3]			=	{0,0,0};//	Acelerometer Values
-
+	#endif
 	/** Alarms **/
+	#ifdef READ_FRSKY
 	uint8_t A1T_1		=	0;			//	Alarm 1 - Analog Input 1 Threshold
 	uint8_t A1G_1		=	0;			//	Alarm 1 - Analog Input 1 Greater Than(1) or Lesser Than (2)
 	uint8_t A1L_1		=	0;			//	Alarm 1 - Analog Input 1 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
@@ -121,7 +125,7 @@ public:
 	uint8_t A2T_2		=	0;			//	Alarm 2 - Analog Input 2 Threshold
 	uint8_t A2G_2		=	0;			//	Alarm 2 - Analog Input 2 Greater Than(1) or Lesser Than (2)
 	uint8_t A2L_2		=	0;			//	Alarm 2 - Analog Input 2 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
-
+	#endif
 
 
 	FrSky()	{

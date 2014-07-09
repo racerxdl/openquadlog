@@ -123,7 +123,7 @@ public:
 	/**
 	 * Checks if there is any data.
 	 */
-	uint8_t CheckData();
+	uint8_t CheckData(FastSerial &);
 
 	/**
 	 * The GPS time
