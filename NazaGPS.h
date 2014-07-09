@@ -19,8 +19,8 @@
 #ifndef NAZAGPS_H
 #define NAZAGPS_H
 
-#define CHKSUM_ERROR_PIN 13
-#define PACKET_OK_PIN 14
+#define CHKSUM_ERROR_PIN -1 //13
+#define PACKET_OK_PIN -1 //14
 
 
 class	NazaGPS	{
@@ -50,7 +50,7 @@ private:
 	/**
 	 * Temporary Buffer for receiving Naza Payloads
 	 */
-	uint8_t buffer[64];
+	uint8_t buffer[128];
 
 	/**
 	 * Current Temp Buffer Position

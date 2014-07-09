@@ -12,42 +12,42 @@
 #include "NazaGPS.h"
 uint8_t NazaGPS::CheckData()	{
 #ifdef READ_NAZA
-	if(Serial.available())	{
+	if(Serial1.available())	{
 		/*
 		 *	Resets the current status pin states.
 		 */
-		digitalWrite(CHKSUM_ERROR_PIN, LOW);
-		digitalWrite(PACKET_OK_PIN, LOW);
+		//digitalWrite(CHKSUM_ERROR_PIN, LOW);
+		//digitalWrite(PACKET_OK_PIN, LOW);
 
 
 		if(buffpos < 2)		{												//	If we dont have the header bytes, we will just read.
-			buffer[buffpos] = Serial.read();
+			buffer[buffpos] = Serial1.read();
 			buffpos ++;
 		}else{
 			if(buffer[0] == 0x55 && buffer[1] == 0xAA)	{					//	Checks if we have the correct heading
 				if(buffpos < 4)	{											//	We need 4 bytes. Head + ID + Size
-					buffer[buffpos] = Serial.read();
-					buffpos ++;
+					buffer[buffpos] = Serial1.read();
+					buffpos++;
 				}else{
 					payloadsize = buffer[3];								//	Size is the 4th byte
-					buffer[buffpos] = Serial.read();
+					buffer[buffpos] = Serial1.read();
 					buffpos ++;
 					if(buffpos == payloadsize+6)	{						//	Ok, so we have all data
 						CalcChecksum();										//	Calculate the checksum
 						if(CompareChecksum(&buffer[buffpos-2]))		{		// 	Checksum OK
 							DecodeMessage(&buffer[4], buffer[2], buffer[3]);//	Decode the message and save the data
-							digitalWrite(PACKET_OK_PIN, HIGH);
+							//digitalWrite(PACKET_OK_PIN, HIGH);
 							buffpos = 0;
 							return 1;
 						}else{												//	Invalid Checksum. Discard all data.
 							buffpos = 0;
-							digitalWrite(CHKSUM_ERROR_PIN, HIGH);
+							//digitalWrite(CHKSUM_ERROR_PIN, HIGH);
 						}
 					}
 				}
 			}else{															// Wrong head, lets clean and restart
 				buffpos = 0;
-				buffer[buffpos] = Serial.read();
+				buffer[buffpos] = Serial1.read();
 				buffpos++;
 			}
 		}
@@ -110,8 +110,8 @@ void NazaGPS::DecodeMessage(uint8_t *data, uint8_t id, uint8_t size)	{
 
 		break;
 		case FIRM:
-			sprintf((char *)hardware_version, "%x.%x.%x.%x\x00", data[11], data[10], data[9], data[8]);
-			sprintf((char *)software_version, "%x.%x.%x.%x\x00", data[7], data[6], data[5], data[4]);
+			//sprintf((char *)hardware_version, "%x.%x.%x.%x\x00", data[11], data[10], data[9], data[8]);
+			//sprintf((char *)software_version, "%x.%x.%x.%x\x00", data[7], data[6], data[5], data[4]);
 		break;
 		default:
 			// Invalid Message: TODO

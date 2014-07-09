@@ -9,7 +9,7 @@
       By: Lucas Teske
 **/
 
-#include <SoftwareSerial.h>
+#include <HardwareSerial.h>
 #include "config.h"
 #include "NazaGPS.h"
 #include "DateTime.h"
@@ -133,12 +133,12 @@ public:
 	/**
 	 * Checks if any frame needs to be sent
 	 */
-	void CheckData(SoftwareSerial &);
+	void CheckData(HardwareSerial &);
 
 	/**
 	 * Writes the internal buffer to the following serial port.
 	 */
-	void WriteBuffer(SoftwareSerial&);
+	void WriteBuffer(HardwareSerial&);
 
 	/**
 	 * Updates the internal data with Naza GPS object
@@ -168,7 +168,7 @@ public:
 	 * 	- Current						[ Divided by 10 ]
 	 * 	- Motor RPM						[ Divided by 60, a.k.a. RPS ]
 	 */
-	void SendFrame1(SoftwareSerial &);	//	200ms
+	void SendFrame1(HardwareSerial &);	//	200ms
 
 	/**
 	 * Sends Frame2 Data. This should be done with an 1s interval
@@ -182,7 +182,7 @@ public:
 	 * 	- Altitude	( From GPS )
 	 * 	- Fuel Level
 	 */
-	void SendFrame2(SoftwareSerial &);	//	1s
+	void SendFrame2(HardwareSerial &);	//	1s
 
 	/**
 	 * Sends Frame3 Data. This should be done with an 5s interval
@@ -192,7 +192,7 @@ public:
 	 * 	- Date
 	 * 	- Time
 	 */
-	void SendFrame3(SoftwareSerial &);	//	5s
+	void SendFrame3(HardwareSerial &);	//	5s
 
 	/**
 	 * Returns the LSB from the current short

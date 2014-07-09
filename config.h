@@ -15,10 +15,13 @@
 //#define USE_SD		//	Use data logging to SD
 //#define LOG_NAZA		//	Log Naza Messages to SD
 //#define LOG_FRSKY		//	Log FrSky Messages to SD
-#define READ_FRSKY		//	Read FrSky Messages
+//#define READ_FRSKY		//	Read FrSky Messages
 #define WRITE_FRSKY		//	Write data to FrSky
 #define READ_NAZA		//	Read NAZA Messages
 
-#define READ_INPUTS
+//#define READ_INPUTS
+
+template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg); return obj; }
+
 
 #endif

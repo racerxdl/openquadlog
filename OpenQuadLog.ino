@@ -16,20 +16,24 @@
 #include "FrSky.h"
 #include "NazaGPS.h"
 
-SoftwareSerial frskyserial(10, 11, true); // RX, TX
 NazaGPS naza;
 FrSky frsky;
-uint8_t buffer[64];
 
 void setup() {
 	digitalWrite(13,HIGH);     		// turn on debugging LED
-	Serial.begin(115200); 			//	Naza GPS Port
-	frskyserial.begin(9600);		//	FrSky Serial Port
+	Serial.begin(115200);
+	Serial1.begin(115200); 			//	Naza GPS Port
+	Serial2.begin(9600);			//	FrSky Serial Port
 }
 
 void loop()	{
-	if(naza.CheckData())	
+	if(naza.CheckData())	{
 		frsky.UpdateDataWithNaza(naza);
-	frsky.CheckData(frskyserial);
+		digitalWrite(13,HIGH);
+		Serial << "Num Sat: " << naza.numSat << "\n";
+		Serial << naza.time.day << "/" << naza.time.month << "/" << naza.time.year << " - " << naza.time.hour << ":" << naza.time.minute << ":" << naza.time.seconds << "\n";
+	}
+	digitalWrite(13,LOW);
+	frsky.CheckData(Serial2);
 }
 

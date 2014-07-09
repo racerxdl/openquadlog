@@ -4,7 +4,7 @@
 
 template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg); return obj; }
 
-SoftwareSerial frskyserial(10, 11, true); // RX, TX
+SoftwareSerial frskyserial(10, 11, false); // RX, TX
 FrSky frsky;
 
 void setup() {

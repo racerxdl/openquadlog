@@ -11,22 +11,25 @@
 
 #include "FrSky.h"
 
-void FrSky::CheckData(SoftwareSerial &ser)	{
+void FrSky::CheckData(HardwareSerial &ser)	{
 #ifdef WRITE_FRSKY
 	/** Checks Frame 1 **/
 	if(lastframe1+FRAME1_TIME < millis())	{
+		Serial.println("Sending Frame1");
 		SendFrame1(ser);
 		lastframe1 = millis();
 	}
 
 	/** Checks Frame 2 **/
 	if(lastframe2+FRAME2_TIME < millis())	{
+		Serial.println("Sending Frame2");
 		SendFrame2(ser);
 		lastframe2 = millis();
 	}
 
 	/** Checks Frame 3 **/
 	if(lastframe3+FRAME3_TIME < millis())	{
+		Serial.println("Sending Frame3");
 		SendFrame3(ser);
 		lastframe3 = millis();
 	}
@@ -90,7 +93,7 @@ void FrSky::ClearBuffer()	{
 	buffsize = 0;
 }
 
-void FrSky::WriteBuffer(SoftwareSerial &ser)	{
+void FrSky::WriteBuffer(HardwareSerial &ser)	{
 #ifdef WRITE_FRSKY
 	int i = 0;
 	while(i<buffsize)	{
@@ -126,11 +129,12 @@ void FrSky::UpdateDataWithNaza(NazaGPS &naza)	{
 	gps_speed		=	naza.ground_speed;
 
 	course 			=	naza.GPSHead;
+	temperature2	=	naza.numSat + naza.fix*10;
 	time.FromDateTime(naza.time);
 #endif
 }
 
-void FrSky::SendFrame1(SoftwareSerial &ser)	{
+void FrSky::SendFrame1(HardwareSerial &ser)	{
 #ifdef WRITE_FRSKY
 	AddToBuffer(ACCX);
 	AddToBuffer(ACCY);
@@ -147,7 +151,7 @@ void FrSky::SendFrame1(SoftwareSerial &ser)	{
 #endif
 }
 
-void FrSky::SendFrame2(SoftwareSerial &ser)	{
+void FrSky::SendFrame2(HardwareSerial &ser)	{
 #ifdef WRITE_FRSKY
 	AddToBuffer(COURSE);
 	AddToBuffer(LATITUDE);
@@ -160,7 +164,7 @@ void FrSky::SendFrame2(SoftwareSerial &ser)	{
 #endif
 }
 
-void FrSky::SendFrame3(SoftwareSerial &ser)	{
+void FrSky::SendFrame3(HardwareSerial &ser)	{
 #ifdef WRITE_FRSKY
 	AddToBuffer(DATE);
 	AddToBuffer(TIME);
