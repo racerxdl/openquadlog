@@ -11,7 +11,7 @@
 
 #include "OQL.h"
 
-uint8_t OQL::CheckData()	{
+uint8_t OQL::CheckData(NazaGPS &naza, FrSky &frsky)	{
 #ifdef READ_INPUTS
 	uint16_t v1r = analogRead(V1_PIN);
 	uint16_t v2r = analogRead(V2_PIN);
@@ -26,6 +26,46 @@ uint8_t OQL::CheckData()	{
 		return 1;
 	}
 #endif
+	String tmp;
+	if(logen)	{
+		File dataFile = SD.open(filename.c_str(), FILE_WRITE);
+		if(dataFile)	{
+			#ifdef READ_NAZA
+			if((naza.recv_version==1) && (versionwrote!=1))	{
+				dataFile << OQL_SOFTVER << ":" << (const char *)naza.software_version << "\n";
+				dataFile << OQL_HARDVER << ":" << (const char *)naza.hardware_version << "\n";
+				versionwrote = 1;
+			}
+			if(GPSChanged(naza))	{
+				lastlat = naza.latitude;
+				lastlon = naza.longitude;
+				lastalt = naza.altitude;
+				lastfix = naza.fix;
+				lastsats= naza.numSat;
+				String gps = naza.GenerateGPSString();
+				#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
+					Serial.println(gps);
+				#endif
+				dataFile << gps.c_str() << "\n";
+			}
+			#endif
+			#ifdef READ_FRSKY
+			if(FrSkyChanged(frsky))	{
+				lastRSSI = frsky.RSSI;
+				lastA1   = frsky.A1;
+				lastA2   = frsky.A2;
+				String frskys = frsky.GenerateFrSkyString();
+				#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
+					Serial.println(frskys);
+				#endif
+				dataFile << frskys.c_str() << "\n";
+			}
+
+			#endif
+			dataFile.close();
+		}
+	}
+
 	return 0;
 }
 
@@ -34,7 +74,7 @@ void OQL::WriteToLog(String &text)	{
 	if(logen)	{
 		File dataFile = SD.open(filename.c_str(), FILE_WRITE);
 		if(dataFile)	{
-			dataFile.println(text);
+			dataFile.print(text);
 			dataFile.close();
 		}
 	}
@@ -44,24 +84,28 @@ void OQL::WriteToLog(const char *text)	{
 	if(logen)	{
 		File dataFile = SD.open(filename.c_str(), FILE_WRITE);
 		if(dataFile)	{
-			dataFile.println(text);
+			dataFile.print(text);
 			dataFile.close();
 		}
 	}
 }
 void OQL::SetFilename()	{
-	int i=0;
-	String file;
-
+	int i;
+	char buff[16];
+	i=1;
 	if(logen)	{
 		while(true)	{
-			file = String("OQL" + String(i, DEC) + ".oqd");
-			if(!SD.exists((char *)file.c_str()))
+			sprintf(buff, "OQL%04d.OQD",i);
+			if(!SD.exists(buff))
 				break;
 			i++;
 		}
-		filename =  file;
-		WriteToLog("LOG:STARTED");
+		filename =  String(buff);
+#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
+		Serial.print("Current Filename: ");
+		Serial.println(filename);
+#endif
+		WriteToLog("LOG:STARTED\n");
 	}
 }
 #endif

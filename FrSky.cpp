@@ -11,6 +11,16 @@
 
 #include "FrSky.h"
 
+String FrSky::GenerateFrSkyString()	{
+	static long ltime = 0;
+	char buff[40];
+	long delta = millis() - ltime;
+	ltime += delta;
+	String tim = time.ToString();
+	sprintf(buff,"FRSKY:%s:%ld:%03u:%03u:%03u\x00",tim.c_str(),delta,RSSI,A1,A2);
+	return String(buff);
+}
+
 void FrSky::CheckData(SoftwareSerial &ser)	{
 #ifdef WRITE_FRSKY
 	unsigned long ctime = millis();
@@ -18,7 +28,7 @@ void FrSky::CheckData(SoftwareSerial &ser)	{
 	/** Checks Frame 1 **/
 
 	if(lastframe1+FRAME1_TIME < ctime)	{
- #ifdef DEBUG_MEGA && DEBUG_MEGA_FRSKY
+ #if defined(DEBUG_MEGA) && defined(DEBUG_MEGA_FRSKY)
 		Serial.println("Sending Frame1");
  #endif
 		SendFrame1(ser);
@@ -27,7 +37,7 @@ void FrSky::CheckData(SoftwareSerial &ser)	{
 
 	/** Checks Frame 2 **/
 	if(lastframe2+FRAME2_TIME < ctime)	{
- #ifdef DEBUG_MEGA && DEBUG_MEGA_FRSKY
+ #if defined(DEBUG_MEGA) && defined(DEBUG_MEGA_FRSKY)
 		Serial.println("Sending Frame2");
  #endif
 		SendFrame2(ser);
@@ -37,7 +47,7 @@ void FrSky::CheckData(SoftwareSerial &ser)	{
 	/** Checks Frame 3 **/
  #ifdef FRSKY_FRAME3
 	if(lastframe3+FRAME3_TIME < millis())	{
-  #ifdef DEBUG_MEGA && DEBUG_MEGA_FRSKY
+  #if defined(DEBUG_MEGA) && defined(DEBUG_MEGA_FRSKY)
  		Serial.println("Sending Frame3");
   #endif
 		SendFrame3(ser);

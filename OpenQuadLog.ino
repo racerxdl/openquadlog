@@ -9,9 +9,10 @@
       By: Lucas Teske
 **/
 
-#define NOHARDWARESERIAL
-
-#include <FastSerial.h>
+#include <FastSerial.h>	
+#include <SPI.h>
+#include <SD.h>
+#include "config.h"
 
 FastSerialPort0(Serial);
 
@@ -20,14 +21,15 @@ FastSerialPort1(Serial1);
 #endif
 
 #include <ctype.h>
-//#include <SD.h>
 #include "SoftwareSerial.h"
 #include "FrSky.h"
+#include "OQL.h"
 #include "NazaGPS.h"
 
 NazaGPS naza;
 FrSky frsky;
 SoftwareSerial frskyport(10,11,true); 	// RX, TX
+OQL *oql;
 
 unsigned long lastFrSkyTime = 0;		//	Just to loadoff the mainloop. We only start the FrSky checks every 200ms
 
@@ -41,6 +43,7 @@ void setup() {
 	#endif
 	frskyport.begin(9600);				//	FrSky Serial Port
 	lastFrSkyTime = millis();
+	oql = new OQL();
 }
 
 void loop()	{
@@ -51,6 +54,7 @@ void loop()	{
 #endif
 		frsky.UpdateDataWithNaza(naza);
 		digitalWrite(13,HIGH);
+		oql->CheckData(naza,frsky);
 	}
 	if(millis() > (lastFrSkyTime+200)){
 		digitalWrite(13,LOW);

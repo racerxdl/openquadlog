@@ -111,6 +111,11 @@ public:
 	};
 
 	/**
+	 * Generates String to Log
+	 */
+	String GenerateGPSString();
+
+	/**
 	 * Decodes the Naza payload
 	 */
 	void DecodeMessage(uint8_t *, uint8_t, uint8_t);
@@ -252,6 +257,8 @@ public:
 	 */
 	uint8_t *software_version;
 
+
+	uint8_t recv_version;
 };
 
 #endif

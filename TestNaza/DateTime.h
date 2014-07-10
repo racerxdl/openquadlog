@@ -30,6 +30,7 @@ public:
 		month	= 	date.month;
 		year 	= 	date.year;
 	}
+
 	uint8_t seconds;
 	uint8_t minute;
 	uint8_t hour;

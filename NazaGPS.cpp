@@ -17,11 +17,21 @@ void NazaGPS::ClearBuffer()	{
 	buffpos = 0;
 }
 
+String NazaGPS::GenerateGPSString()	{
+	static long ltime = 0;
+	long delta = millis() - ltime;
+	ltime += delta;
+	char buff[64];
+	String tim = time.ToString();
+	sprintf(buff,"GPS:%s:%ld:%ld:%ld:%ld:%u:%u\x00",tim.c_str(),delta,latitude,longitude,altitude,fix,numSat);
+	return String(buff);
+}
+
 uint8_t NazaGPS::CheckData(FastSerial &ser)	{
 #ifdef READ_NAZA
 	while(ser.available())	{
 		uint8_t data = ser.read();
- 	 	#ifdef DEBUG_MEGA && MEGA_MODE
+ 	 	#if defined(DEBUG_MEGA) && defined(MEGA_MODE) && defined(DEBUG_NAZA)
 		if(buffpos > 128)
 			Serial.println("BUFFER OVERFLOW");
 
@@ -40,7 +50,7 @@ uint8_t NazaGPS::CheckData(FastSerial &ser)	{
 					buffer[buffpos] = data;
 					buffpos ++;
 					if(payloadsize > 96)	{
-						#ifdef DEBUG_MEGA && MEGA_MODE
+						#if defined(DEBUG_MEGA) && defined(MEGA_MODE) && defined(DEBUG_NAZA)
 						Serial.println("Corrupt packet!");
 						for(int i=0;i<32;i++)	{
 							Serial.print(buffer[i],HEX);
@@ -56,7 +66,7 @@ uint8_t NazaGPS::CheckData(FastSerial &ser)	{
 						if(CompareChecksum(&buffer[buffpos-2]))		{		// 	Checksum OK
 							DecodeMessage(&buffer[4], buffer[2], buffer[3]);//	Decode the message and save the data
 							ClearBuffer();
-							#ifdef DEBUG_MEGA && MEGA_MODE
+							#if defined(DEBUG_MEGA) && defined(MEGA_MODE) && defined(DEBUG_NAZA)
 							Serial.println("OK");
 							#endif
 							return 1;
@@ -67,7 +77,7 @@ uint8_t NazaGPS::CheckData(FastSerial &ser)	{
 					}
 				}
 			}else{															// Wrong head, lets clean and restart
-				#ifdef DEBUG_MEGA && MEGA_MODE
+				#if defined(DEBUG_MEGA) && defined(MEGA_MODE) && defined(DEBUG_NAZA)
 				Serial.println("Wrong head received.");
 				#endif
 				ClearBuffer();
@@ -136,9 +146,10 @@ void NazaGPS::DecodeMessage(uint8_t *data, uint8_t id, uint8_t size)	{
 		case FIRM:
 			sprintf((char *)hardware_version, "%x.%x.%x.%x\x00", data[11], data[10], data[9], data[8]);
 			sprintf((char *)software_version, "%x.%x.%x.%x\x00", data[7], data[6], data[5], data[4]);
+			recv_version = 1;
 		break;
 		default:
-		#ifdef DEBUG_MEGA
+		#ifdef DEBUG_MEGA && MEGA_MODE && DEBUG_NAZA
 			Serial.print("Received unknown message id: ");
 			Serial.println(id, HEX);
 		#endif

@@ -11,6 +11,8 @@
 
 
 #include <stdint.h>
+#include <stdio.h>
+#include <Arduino.h>
 
 #ifndef DATETIME_H
 #define DATETIME_H
@@ -29,6 +31,11 @@ public:
 		day 	= 	date.day;
 		month	= 	date.month;
 		year 	= 	date.year;
+	}
+	String ToString() {
+		uint8_t tmp[64];
+		sprintf((char *)tmp, "%02d/%02d/%02d-%02d:%02d:%02d\x00",year,month,day,hour,minute,seconds);
+		return String((char *)tmp);
 	}
 	uint8_t seconds;
 	uint8_t minute;

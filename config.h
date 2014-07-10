@@ -38,29 +38,31 @@
 
 #define MEGA_MODE				//	Test the sketch on Arduino Mega
 
-//#define USE_SD				//	Use data logging to SD
+#define USE_SD				//	Use data logging to SD
 //#define LOG_NAZA				//	Log Naza Messages to SD
 //#define LOG_FRSKY				//	Log FrSky Messages to SD
-//#define READ_FRSKY			//	Read FrSky Messages
+#define READ_FRSKY				//	Read FrSky Messages
 #define WRITE_FRSKY				//	Write data to FrSky
 #define READ_NAZA				//	Read NAZA Messages
 
 //#define READ_INPUTS
 
-//#define DEBUG_MEGA			//	Enables Serial0 Debugging. Only on MEGA640 and up
+#define DEBUG_MEGA			//	Enables Serial0 Debugging. Only on MEGA640 and up
+//#define DEBUG_NAZA
+//#define DEBUG_FRSKY
 
 /* FrSky Defines */
 
 //#define DEBUG_MEGA_FRSKY		//	Enables FrSky Framing Time debug
 
 //#define FRSKY_ACC				//	Eanbles sending accelerometer values
-//#define FRSKY_CELLS				//	Enables sending cells voltage
+//#define FRSKY_CELLS			//	Enables sending cells voltage
 //#define FRSKY_RPM				//	Enables sending RPM data
-//#define FRSKY_FUEL				//	Enables sending fuel
+//#define FRSKY_FUEL			//	Enables sending fuel
 //#define FRSKY_FRAME3			//	Enables FrSky Frame 3 (That sends only datetime)
 
 
-template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg); return obj; }
+template<class T> inline Print &operator <<(Print &obj, T arg) { obj.write(arg); return obj; }
 
 
 #endif

@@ -136,6 +136,13 @@ public:
 		for(int i=0;i<128;i++)
 			buffer[i] = 0x00;
 	}
+
+	/**
+	 * Generates the FrSky String to logger
+	 */
+
+	String GenerateFrSkyString();
+
 	/**
 	 * Checks if any frame needs to be sent
 	 */
