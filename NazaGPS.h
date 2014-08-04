@@ -156,6 +156,11 @@ public:
 	int32_t altitude					=	0;	//	mm
 
 	/**
+	 * The GPS Start altitude in mm, for calculating relative altitudes
+	 */
+	int32_t start_altitude				=	0;	//	mm
+
+	/**
 	 * The horizontal accuracy in mm
 	 */
 	uint32_t horizontal_accuracy 		= 	0;	//	mm
@@ -215,6 +220,11 @@ public:
 	 * The Current Fix
 	 */
 	FixType fix							= 	NO_FIX;
+
+	/**
+	 * Last Fix. To calculating Relative Altitude
+	 */
+	FixType lastfix						=	NO_FIX;
 
 	/**
 	 * The Fix Status

@@ -147,7 +147,7 @@ void FrSky::UpdateDataWithNaza(NazaGPS &naza)	{
 	latitude 		= 	naza.latitude;
 	longitude 		= 	naza.longitude;
 
-	altitude		=	gps_altitude;
+	altitude		=	10*(gps_altitude - naza.start_altitude);
 	gps_speed		=	naza.ground_speed;
 
 	course 			=	naza.GPSHead;
@@ -304,6 +304,8 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 	case LONGITUDE:
 		k = (longitude/1e7);
 		d = (longitude - (k*1e7));
+		k = abs(k);
+		d = abs(d);
 
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = LONGITUDE;
@@ -326,7 +328,8 @@ void FrSky::AddToBuffer(FrSkyID id)	{
 	case LATITUDE:
 		k = (latitude/1e7);
 		d = (latitude - (k*1e7));
-
+		k = abs(k);
+		d = abs(d);
 		buffer[buffsize	] = HEADER;
 		buffer[buffsize+1] = LATITUDE;
 		buffer[buffsize+2] = lsb(k);

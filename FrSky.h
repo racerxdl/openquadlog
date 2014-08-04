@@ -17,9 +17,9 @@
 #ifndef FRSKY_H
 #define FRSKY_H
 
-#define FRAME1_TIME 200
-#define FRAME2_TIME 1000
-#define FRAME3_TIME 5000
+#define FRAME1_TIME 200			//	The FRAME1 Period in ms defaults to 200ms
+#define FRAME2_TIME 1000		//	The FRAME2 Period in ms defaults to 1000ms
+#define FRAME3_TIME 5000		//	The FRAME3 Period in ms defaults to 5000ms
 
 #ifdef FRSKY_CELL
 	#define CELL_VMAX_C 159.f	//	The max value at variable
@@ -31,18 +31,47 @@
 class FrSky	{
 private:
 
+	/**
+	 * Buffer for sending FrSky messages
+	 */
 	uint8_t buffer[128];
 
+	/**
+	 * Current Buffer Size (filled bytes)
+	 */
 	uint8_t buffsize		=	0;
 
+	/**
+	 * Last Frame 1 Time (millis)
+	 */
 	uint32_t lastframe1		=	0;
+	/**
+	 * Last Frame 2 Time (millis)
+	 */
 	uint32_t lastframe2		=	0;
+	/**
+	 * Last Frame 3 Time (millis)
+	 */
 	uint32_t lastframe3		=	0;
 
+	/**
+	 * Buffer for receiving FrSky Messages
+	 */
 	uint8_t inbuffer[12];
+
+	/**
+	 * Input Buffer Position
+	 */
 	uint8_t inbuffpos		=	0;
+
+	/**
+	 * If we need to do byte stuffing on next byte
+	 */
 	uint8_t xornext			=	0;
 
+	/**
+	 * The Message IDs from FrSky
+	 */
 	enum FrSkyID	{
 		GPSALT         =	0x1,
 		TEMP1          =	0x2,
@@ -70,6 +99,9 @@ private:
 		VOLTAGEDEC     =	0x3B
 	};
 
+	/**
+	 * FrSky Message Control Values
+	 */
 	enum FrSkyCtrl	{
 		HEADER	=	0x5e,
 		TAIL	=	0x5e,
@@ -79,21 +111,80 @@ private:
 
 public:
 
+	/**
+	 * FrSky Receiver Signal
+	 */
 	uint8_t RSSI			=	0;		//	Receiver Signal
+
+	/**
+	 * FrSky A1 Analog Port Value
+	 */
 	uint8_t A1				=	0;		//	Analog Input 1 Value
+
+	/**
+	 * FrSky A2 Analog Port Value
+	 */
 	uint8_t A2				=	0;		//	Analog Input 2 Value
 
+	/**
+	 * GPS Altitude in mm
+	 */
 	int32_t gps_altitude	= 	0;		//	The GPS Altitude
+
+	/**
+	 * GPS Latitude
+	 *
+	 * Multiplied by 1e7 (10.000.000)
+	 */
 	int32_t latitude		= 	0;		//	The GPS Latitude
+
+	/**
+	 * GPS Longitude
+	 *
+	 * Multiplied by 1e7 (10.000.000)
+	 */
 	int32_t longitude		=   0;		//	The GPS Longitude
 
+	/**
+	 * Temperature 1
+	 */
 	int8_t temperature1		= 	0;		//	Temperature 1
+
+	/**
+	 * Temperature 2
+	 * We actually use this for GPS Fix / Num Sats
+	 * We have two digits for T2: XY
+	 * X => Fix Type (0 = NoFix, 2 = 2D Fix, 3 = 3D Fix)
+	 * Y => Num Sats
+	 *
+	 * It MAY show 4 in Fix type, this happens because overflow of Y (like, 41 means 3D Fix with 11 Sats)
+	 */
 	int8_t temperature2		= 	0;		//	Temperature 2
 
+	/**
+	 * Motor RPM
+	 *
+	 * This is multiplied by number of blades
+	 */
 	uint16_t rpm			=	0;		//	Motor RPM * Number of blades
+
+	/**
+	 * Fuel Level
+	 *
+	 * Scale in percent (0% to 100%)
+	 */
 	uint16_t fuellevel		=	0;		//	Fuel Level (in percent)
 
+	/**
+	 * Variometer Altitude
+	 *
+	 * Scale in cm multiplied by 10
+	 */
 	uint16_t altitude		=	0;		//	Variometer Altitude (or Barometer)
+
+	/**
+	 * GPS Ground Speed in knots
+	 */
 	uint32_t gps_speed		=	0;		//	GPS Ground Speed (knots)
 
     /**
@@ -101,15 +192,40 @@ public:
      */
 	uint16_t cell[6]	    =	{0,0,0,0,0,0};
 
+	/**
+	 * GPS Course
+	 *
+	 * Scale in Degrees
+	 */
 	float course			=	0;		//	GPS Course in Degrees
+
+	/**
+	 * GPS Time
+	 */
 	DateTime time;						//	GPS Time
 
+	/**
+	 * Battery Voltage
+	 *
+	 * Multiplied by 10
+	 */
 	uint16_t voltage		=	0;		// 	Battery Voltage * 10
-	uint16_t current		=	0; 	    //	Current * 10
+
+	/**
+	 * Current Draw
+	 *
+	 * Multiplied by 10
+	 */
+	uint16_t current		=	0;
 
 	#ifdef FRSKY_ACC
+	/**
+	 * Acelerometer
+	 * An 16 bit 3 component array corresponding X,Y,Z raw values from accelerometer.
+	 */
 	uint16_t acc[3]			=	{0,0,0};//	Acelerometer Values
 	#endif
+
 	/** Alarms **/
 	#ifdef READ_FRSKY
 	uint8_t A1T_1		=	0;			//	Alarm 1 - Analog Input 1 Threshold

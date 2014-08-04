@@ -26,6 +26,7 @@ uint8_t OQL::CheckData(NazaGPS &naza, FrSky &frsky)	{
 		return 1;
 	}
 #endif
+#ifdef USE_SD
 	String tmp;
 	if(logen)	{
 		File dataFile = SD.open(filename.c_str(), FILE_WRITE);
@@ -65,7 +66,7 @@ uint8_t OQL::CheckData(NazaGPS &naza, FrSky &frsky)	{
 			dataFile.close();
 		}
 	}
-
+#endif
 	return 0;
 }
 

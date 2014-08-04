@@ -36,9 +36,9 @@
 #ifndef OQLDEFS
 #define OQLDEFS
 
-#define MEGA_MODE				//	Test the sketch on Arduino Mega
+//#define MEGA_MODE				//	Test the sketch on Arduino Mega
 
-#define USE_SD				//	Use data logging to SD
+//#define USE_SD				//	Use data logging to SD
 //#define LOG_NAZA				//	Log Naza Messages to SD
 //#define LOG_FRSKY				//	Log FrSky Messages to SD
 #define READ_FRSKY				//	Read FrSky Messages
@@ -47,7 +47,7 @@
 
 //#define READ_INPUTS
 
-#define DEBUG_MEGA			//	Enables Serial0 Debugging. Only on MEGA640 and up
+//#define DEBUG_MEGA			//	Enables Serial0 Debugging. Only on MEGA640 and up
 //#define DEBUG_NAZA
 //#define DEBUG_FRSKY
 

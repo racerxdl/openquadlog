@@ -23,7 +23,7 @@ String NazaGPS::GenerateGPSString()	{
 	ltime += delta;
 	char buff[64];
 	String tim = time.ToString();
-	sprintf(buff,"GPS:%s:%ld:%ld:%ld:%ld:%u:%u\x00",tim.c_str(),delta,latitude,longitude,altitude,fix,numSat);
+	sprintf(buff,"GPS:%s:%ld:%ld:%ld:%ld:%ld:%u:%u\x00",tim.c_str(),delta,latitude,longitude,altitude,start_altitude,fix,numSat);
 	return String(buff);
 }
 
@@ -128,6 +128,13 @@ void NazaGPS::DecodeMessage(uint8_t *data, uint8_t id, uint8_t size)	{
 
 			fix					=	(FixType)data[50];
 			FixStatus			=	data[52];
+			Serial.println(numSat, DEC);
+			if(lastfix == NO_FIX)	{
+				if(fix == LOCK_3D && numSat >= 7)	{
+					start_altitude = altitude;
+					lastfix = LOCK_3D;
+				}
+			}
 
 		break;
 		case MAG:
