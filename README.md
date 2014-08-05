@@ -6,4 +6,11 @@
 	      |_|                                                  |___/
 
 This is a Open Datalogger Project for Quadcopters (Multirotors)
-For now it doesnt do any data logging, but reads Naza GPS and converts to FrSky Telemetry.
+
+
+The current code reads FrSky Telemetry Data and Naza GPS Data (through serial).
+It does also data logging to SD Card (if enabled), convert GPS Data to FrSky Telemetry.
+
+Tested on Turnigy 9XR with ER9X + FrSky Telemetry Mod.
+
+The binary **OpenQuadLog-20140804.hex** is non-sd enabled. It only does FrSky <> Naza telemetry convert.
