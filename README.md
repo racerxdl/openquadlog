@@ -14,3 +14,4 @@ It does also data logging to SD Card (if enabled), convert GPS Data to FrSky Tel
 Tested on Turnigy 9XR with ER9X + FrSky Telemetry Mod.
 
 The binary **OpenQuadLog-20140804.hex** is non-sd enabled. It only does FrSky <> Naza telemetry convert.
+
