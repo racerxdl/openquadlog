@@ -10,8 +10,11 @@
 **/
 
 #include <FastSerial.h>	
+#include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
+
+
 #include "config.h"
 
 FastSerialPort0(Serial);
@@ -25,13 +28,21 @@ FastSerialPort1(Serial1);
 #include "FrSky.h"
 #include "OQL.h"
 #include "NazaGPS.h"
+#include "Baro.h"
 
 NazaGPS naza;
 FrSky frsky;
 SoftwareSerial frskyport(10,11,true); 	// RX, TX
 OQL *oql;
 
+#ifdef READ_BARO
+Barometer baro;
+unsigned long lastBaroTemp 	= 0;		//	Another Load Off for MainLoop.
+unsigned long lastBaroPress = 0;		//	Same as up
+#endif
+
 unsigned long lastFrSkyTime = 0;		//	Just to loadoff the mainloop. We only start the FrSky checks every 200ms
+
 
 void setup() {
 	Serial.begin(115200);				//	Naza GPS Port on Non-MEGA mode, Debug Port on MEGA Mode
@@ -44,6 +55,13 @@ void setup() {
 	frskyport.begin(9600);				//	FrSky Serial Port
 	lastFrSkyTime = millis();
 	oql = new OQL();
+	
+	#ifdef READ_BARO
+		baro.Start();
+		baro.UpdateTemp();
+		baro.UpdatePressure();
+		baro.SetBaseAltitude();
+	#endif
 }
 
 void loop()	{
@@ -56,11 +74,24 @@ void loop()	{
 		digitalWrite(13,HIGH);
 		oql->CheckData(naza,frsky);
 	}
-	if(millis() > (lastFrSkyTime+200)){
+	if(millis() > (lastFrSkyTime+FRSKY_INTERVAL)){
 		digitalWrite(13,LOW);
 		digitalWrite(14, LOW);
 		frsky.CheckData(frskyport);
 		lastFrSkyTime= millis();
 	}
+	
+	#ifdef READ_BARO
+	if(millis() > (lastBaroTemp+BAROTEMP_INTERVAL))	{
+		baro.UpdateTemp();
+		lastBaroTemp = millis();
+	}
+	
+	if(millis() > (lastBaroPress+BAROPRESS_INTERVAL)) {
+		baro.UpdatePressure();
+		frsky.UpdateWithBarometer(baro);
+		lastBaroPress = millis();
+	} 
+	#endif
 }
 

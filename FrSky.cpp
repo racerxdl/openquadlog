@@ -147,7 +147,9 @@ void FrSky::UpdateDataWithNaza(NazaGPS &naza)	{
 	latitude 		= 	naza.latitude;
 	longitude 		= 	naza.longitude;
 
+#ifndef READ_BARO
 	altitude		=	10*(gps_altitude - naza.start_altitude);
+#endif
 	gps_speed		=	naza.ground_speed;
 
 	course 			=	naza.GPSHead;
@@ -155,6 +157,13 @@ void FrSky::UpdateDataWithNaza(NazaGPS &naza)	{
 	time.FromDateTime(naza.time);
 #endif
 }
+
+#ifdef READ_BARO
+void FrSky::UpdateWithBarometer(Barometer &baro)	{
+	temperature1	=	(int8_t) baro.Temperature;
+	altitude		=	(baro.Altitude - baro.BaseAltitude)/10;
+}
+#endif
 
 void FrSky::SendFrame1(SoftwareSerial &ser)	{
 #ifdef WRITE_FRSKY

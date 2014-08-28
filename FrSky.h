@@ -12,6 +12,7 @@
 
 #include "config.h"
 #include "NazaGPS.h"
+#include "Baro.h"
 #include "DateTime.h"
 
 #ifndef FRSKY_H
@@ -148,7 +149,7 @@ public:
 	/**
 	 * Temperature 1
 	 */
-	int8_t temperature1		= 	0;		//	Temperature 1
+	int8_t temperature1		= 	0;		//	Temperature from barometer
 
 	/**
 	 * Temperature 2
@@ -273,6 +274,14 @@ public:
 	 * Updates the internal data with Naza GPS object
 	 */
 	void UpdateDataWithNaza(NazaGPS &);
+
+#ifdef READ_BARO
+	/**
+	 * Updates the internal data with Barometer
+	 */
+
+	void UpdateWithBarometer(Barometer &);
+#endif
 
 	/**
 	 * Adds an Data ID to the internal buffer

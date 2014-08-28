@@ -32,6 +32,7 @@
 
 #include <FastSerial.h>
 #include <SoftwareSerial.h>
+#include <Wire.h>
 
 #ifndef OQLDEFS
 #define OQLDEFS
@@ -44,6 +45,7 @@
 #define READ_FRSKY				//	Read FrSky Messages
 #define WRITE_FRSKY				//	Write data to FrSky
 #define READ_NAZA				//	Read NAZA Messages
+#define READ_BARO				//	Read Barometer
 
 //#define READ_INPUTS
 
@@ -61,6 +63,9 @@
 //#define FRSKY_FUEL			//	Enables sending fuel
 //#define FRSKY_FRAME3			//	Enables FrSky Frame 3 (That sends only datetime)
 
+#define FRSKY_INTERVAL		200	//	200ms between checks
+#define BAROTEMP_INTERVAL	500	//	100ms between checks
+#define BAROPRESS_INTERVAL	300	//	50ms between checks
 
 template<class T> inline Print &operator <<(Print &obj, T arg) { obj.write(arg); return obj; }
 
