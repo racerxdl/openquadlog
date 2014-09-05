@@ -12,21 +12,18 @@
 
 #include "config.h"
 #include "NazaGPS.h"
-#include "Baro.h"
 #include "DateTime.h"
 
 #ifndef FRSKY_H
 #define FRSKY_H
-
-#define FRAME1_TIME 200			//	The FRAME1 Period in ms defaults to 200ms
-#define FRAME2_TIME 1000		//	The FRAME2 Period in ms defaults to 1000ms
-#define FRAME3_TIME 5000		//	The FRAME3 Period in ms defaults to 5000ms
 
 #ifdef FRSKY_CELL
 	#define CELL_VMAX_C 159.f	//	The max value at variable
 	#define CELL_VMAX_V 508.f	//	The max voltage that this max variable value is
 
 	#define CELL_V2C(x) ((uint8_t)(( CELL_VMAX_C * x ) / CELL_VMAX_V))
+	#define CELL_C2V(x) ((uint16_t)(( CELL_VMAX_V * x ) / CELL_VMAX_C))
+
 #endif
 
 class FrSky	{
@@ -104,10 +101,11 @@ private:
 	 * FrSky Message Control Values
 	 */
 	enum FrSkyCtrl	{
-		HEADER	=	0x5e,
-		TAIL	=	0x5e,
-		ESCAPE	=	0x5d,
-		DECIMAL	=	0x8
+		HEADER		=	0x5E,
+		TAIL		=	0x5E,
+		ESCAPE		=	0x5D,
+		ALARM_HEAD	=	0x7E,
+		DECIMAL		=	0x08
 	};
 
 public:
@@ -145,6 +143,22 @@ public:
 	 * Multiplied by 1e7 (10.000.000)
 	 */
 	int32_t longitude		=   0;		//	The GPS Longitude
+
+	/**
+	 * EAST/WEST
+	 *
+	 * Direction of longitude
+	 */
+
+	uint8_t eastwest		=	'E';
+
+	/**
+	 * NORTH/SOUTH
+	 *
+	 * Direction of latitude
+	 */
+
+	uint8_t northsouth		=	'N';
 
 	/**
 	 * Temperature 1
@@ -219,16 +233,14 @@ public:
 	 */
 	uint16_t current		=	0;
 
-	#ifdef FRSKY_ACC
 	/**
 	 * Acelerometer
 	 * An 16 bit 3 component array corresponding X,Y,Z raw values from accelerometer.
 	 */
 	uint16_t acc[3]			=	{0,0,0};//	Acelerometer Values
-	#endif
+
 
 	/** Alarms **/
-	#ifdef READ_FRSKY
 	uint8_t A1T_1		=	0;			//	Alarm 1 - Analog Input 1 Threshold
 	uint8_t A1G_1		=	0;			//	Alarm 1 - Analog Input 1 Greater Than(1) or Lesser Than (2)
 	uint8_t A1L_1		=	0;			//	Alarm 1 - Analog Input 1 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
@@ -242,8 +254,6 @@ public:
 	uint8_t A2T_2		=	0;			//	Alarm 2 - Analog Input 2 Threshold
 	uint8_t A2G_2		=	0;			//	Alarm 2 - Analog Input 2 Greater Than(1) or Lesser Than (2)
 	uint8_t A2L_2		=	0;			//	Alarm 2 - Analog Input 2 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
-	#endif
-
 
 	FrSky()	{
 		// Lets set the current time to frames
@@ -261,76 +271,19 @@ public:
 	String GenerateFrSkyString();
 
 	/**
+	 * Generates FrSky GPS String to logger
+	 */
+	String GenerateFrSkyGPSString();
+
+	/**
 	 * Checks if any frame needs to be sent
 	 */
 	void CheckData(SoftwareSerial &);
 
 	/**
-	 * Writes the internal buffer to the following serial port.
-	 */
-	void WriteBuffer(SoftwareSerial&);
-
-	/**
-	 * Updates the internal data with Naza GPS object
-	 */
-	void UpdateDataWithNaza(NazaGPS &);
-
-#ifdef READ_BARO
-	/**
-	 * Updates the internal data with Barometer
-	 */
-
-	void UpdateWithBarometer(Barometer &);
-#endif
-
-	/**
-	 * Adds an Data ID to the internal buffer
-	 */
-	void AddToBuffer(FrSkyID);
-
-	/**
 	 * Clears internal buffer
 	 */
 	inline void ClearBuffer();
-
-	/**
-	 * Sends Frame1 Data. This should be done with an 200ms interval
-	 *
-	 * It is composed by:
-	 * <p>
-	 * 	- Accelerometer Values (x,y,z) 	[ Divided by 1000 ]
-	 * 	- Altitude (From variometer)	[ - 10cm ]
-	 * 	- Temperature 1
-	 * 	- Temperature 2
-	 * 	- Voltage
-	 * 	- Current						[ Divided by 10 ]
-	 * 	- Motor RPM						[ Divided by 60, a.k.a. RPS ]
-	 */
-	void SendFrame1(SoftwareSerial &);	//	200ms
-
-	/**
-	 * Sends Frame2 Data. This should be done with an 1s interval
-	 *
-	 * It is composed by:
-	 * <p>
-	 * 	- Course
-	 * 	- Latitude
-	 * 	- Longitude
-	 * 	- Speed
-	 * 	- Altitude	( From GPS )
-	 * 	- Fuel Level
-	 */
-	void SendFrame2(SoftwareSerial &);	//	1s
-
-	/**
-	 * Sends Frame3 Data. This should be done with an 5s interval
-	 *
-	 * It is composed by:
-	 * <p>
-	 * 	- Date
-	 * 	- Time
-	 */
-	void SendFrame3(SoftwareSerial &);	//	5s
 
 	/**
 	 * Returns the LSB from the current short
@@ -341,6 +294,13 @@ public:
 	 * Returns the MSB from current short
 	 */
 	static inline uint8_t msb(uint16_t value)	{  return ((uint8_t) ((value) >> 8));	}
+
+	/**
+	 * Returns an uint16_t given MSB and LSB values
+	 */
+	static inline uint16_t To16(uint8_t msb, uint8_t lsb)	{
+		return (((uint16_t)msb) << 8) + lsb;
+	}
 };
 
 #endif

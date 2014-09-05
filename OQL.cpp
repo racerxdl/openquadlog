@@ -11,58 +11,26 @@
 
 #include "OQL.h"
 
-uint8_t OQL::CheckData(NazaGPS &naza, FrSky &frsky)	{
-#ifdef READ_INPUTS
-	uint16_t v1r = analogRead(V1_PIN);
-	uint16_t v2r = analogRead(V2_PIN);
-	uint8_t  s1r = digitalRead(S1_PIN);
-	uint8_t  s2r = digitalRead(S2_PIN);
-
-	if(S1TOVAL(v1r) != v1 || S1TOVAL(v2r) != v2 || s1r != s1 || s2r != s2)	{
-		s1 = s1r;
-		s2 = s2r;
-		v1 = S1TOVAL(v1r);
-		v2 = S1TOVAL(v2r);
-		return 1;
-	}
-#endif
+uint8_t OQL::CheckData(FrSky &frsky)	{
 #ifdef USE_SD
 	String tmp;
 	if(logen)	{
 		File dataFile = SD.open(filename.c_str(), FILE_WRITE);
 		if(dataFile)	{
-			#ifdef READ_NAZA
-			if((naza.recv_version==1) && (versionwrote!=1))	{
-				dataFile << OQL_SOFTVER << ":" << (const char *)naza.software_version << "\n";
-				dataFile << OQL_HARDVER << ":" << (const char *)naza.hardware_version << "\n";
-				versionwrote = 1;
-			}
-			if(GPSChanged(naza))	{
-				lastlat = naza.latitude;
-				lastlon = naza.longitude;
-				lastalt = naza.altitude;
-				lastfix = naza.fix;
-				lastsats= naza.numSat;
-				String gps = naza.GenerateGPSString();
-				#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
-					Serial.println(gps);
-				#endif
-				dataFile << gps.c_str() << "\n";
-			}
-			#endif
-			#ifdef READ_FRSKY
-			if(FrSkyChanged(frsky))	{
-				lastRSSI = frsky.RSSI;
-				lastA1   = frsky.A1;
-				lastA2   = frsky.A2;
+			if(millis() > (lastFrSkyTime+FRSKY_WRITE_INTERVAL))	{
 				String frskys = frsky.GenerateFrSkyString();
 				#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
 					Serial.println(frskys);
 				#endif
 				dataFile << frskys.c_str() << "\n";
 			}
-
-			#endif
+			if(millis() > (lastGPSTime+GPS_WRITE_INTERVAL))	{
+				String gps = frsky.GenerateFrSkyGPSString();
+				#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
+					Serial.println(gps);
+				#endif
+				dataFile << gps.c_str() << "\n";
+			}
 			dataFile.close();
 		}
 	}
@@ -71,7 +39,7 @@ uint8_t OQL::CheckData(NazaGPS &naza, FrSky &frsky)	{
 }
 
 #ifdef USE_SD
-void OQL::WriteToLog(String &text)	{
+void OQL::WriteToLog(const String &text)	{
 	if(logen)	{
 		File dataFile = SD.open(filename.c_str(), FILE_WRITE);
 		if(dataFile)	{
@@ -106,7 +74,9 @@ void OQL::SetFilename()	{
 		Serial.print("Current Filename: ");
 		Serial.println(filename);
 #endif
-		WriteToLog("LOG:STARTED\n");
+		WriteToLog("LOG:STARTED:");
+		WriteToLog(OQL_VER);
+		WriteToLog("\n");
 	}
 }
 #endif

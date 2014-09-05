@@ -37,17 +37,12 @@
 #ifndef OQLDEFS
 #define OQLDEFS
 
-//#define MEGA_MODE				//	Test the sketch on Arduino Mega
+#define MEGA_MODE			//	Test the sketch on Arduino Mega
 
-//#define USE_SD				//	Use data logging to SD
-//#define LOG_NAZA				//	Log Naza Messages to SD
-//#define LOG_FRSKY				//	Log FrSky Messages to SD
-#define READ_FRSKY				//	Read FrSky Messages
-#define WRITE_FRSKY				//	Write data to FrSky
-#define READ_NAZA				//	Read NAZA Messages
-#define READ_BARO				//	Read Barometer
+#define USE_SD				//	Use data logging to SD
+#define LOG_FRSKY			//	Log FrSky Messages to SD
 
-//#define READ_INPUTS
+#define READ_INPUTS
 
 //#define DEBUG_MEGA			//	Enables Serial0 Debugging. Only on MEGA640 and up
 //#define DEBUG_NAZA
@@ -63,9 +58,9 @@
 //#define FRSKY_FUEL			//	Enables sending fuel
 //#define FRSKY_FRAME3			//	Enables FrSky Frame 3 (That sends only datetime)
 
-#define FRSKY_INTERVAL		200	//	200ms between checks
-#define BAROTEMP_INTERVAL	500	//	100ms between checks
-#define BAROPRESS_INTERVAL	300	//	50ms between checks
+#define FRSKY_INTERVAL			50		//	50ms between checks
+#define GPS_WRITE_INTERVAL		250		//	250ms between gps writes
+#define FRSKY_WRITE_INTERVAL	1000	//	1s between frsky writes
 
 template<class T> inline Print &operator <<(Print &obj, T arg) { obj.write(arg); return obj; }
 
