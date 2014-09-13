@@ -11,27 +11,32 @@
 
 #include "OQL.h"
 
+const String OQL::OQL_VER	= OQL_VERSION;
+
 uint8_t OQL::CheckData(FrSky &frsky)	{
 #ifdef USE_SD
-	String tmp;
+#if defined(DEBUG_OQL) && defined (DEBUG_MEGA)
+	if(millis() > (lastFrSkyTime+FRSKY_WRITE_INTERVAL))	{
+		#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
+		frsky.WriteFrskyString(Serial);
+		#endif
+			lastFrSkyTime = millis();
+	}
+	if(millis() > (lastGPSTime+GPS_WRITE_INTERVAL))	{
+		#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
+		frsky.WriteFrskyGPSString(Serial);
+		#endif
+		lastGPSTime = millis();
+	}
+#endif
 	if(logen)	{
-		File dataFile = SD.open(filename.c_str(), FILE_WRITE);
-		if(dataFile)	{
-			if(millis() > (lastFrSkyTime+FRSKY_WRITE_INTERVAL))	{
-				String frskys = frsky.GenerateFrSkyString();
-				#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
-					Serial.println(frskys);
-				#endif
-				dataFile << frskys.c_str() << "\n";
-			}
-			if(millis() > (lastGPSTime+GPS_WRITE_INTERVAL))	{
-				String gps = frsky.GenerateFrSkyGPSString();
-				#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
-					Serial.println(gps);
-				#endif
-				dataFile << gps.c_str() << "\n";
-			}
-			dataFile.close();
+		if(millis() > (lastFrSkyTime+FRSKY_WRITE_INTERVAL))	{
+			frsky.WriteFrskyString(filename);
+			lastFrSkyTime = millis();
+		}
+		if(millis() > (lastGPSTime+GPS_WRITE_INTERVAL))	{
+			frsky.WriteFrskyGPSString(filename);
+			lastGPSTime = millis();
 		}
 	}
 #endif

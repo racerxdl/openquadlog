@@ -22,10 +22,6 @@
 
 FastSerialPort0(Serial);
 
-#ifdef MEGA_MODE
-FastSerialPort1(Serial1);
-#endif
-
 #include <ctype.h>
 #include "SoftwareSerial.h"
 #include "FrSky.h"
@@ -40,6 +36,10 @@ unsigned long lastFrSkyTime = 0;		//	Just to loadoff the mainloop. We only start
 
 void setup() {
 	Serial.begin(115200);				//	Naza GPS Port on Non-MEGA mode, Debug Port on MEGA Mode
+
+#if defined(DEBUG_MEGA) && defined(MEGA_MODE)
+	Serial.println("Starting");
+#endif
 	frskyport.begin(9600);				//	FrSky Serial Port
 	lastFrSkyTime = millis();
 	oql = new OQL();
@@ -52,5 +52,6 @@ void loop()	{
 		frsky.CheckData(frskyport);
 		lastFrSkyTime= millis();
 	}
+	oql->CheckData(frsky);
 }
 

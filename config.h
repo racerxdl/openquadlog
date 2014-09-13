@@ -42,24 +42,22 @@
 #define USE_SD				//	Use data logging to SD
 #define LOG_FRSKY			//	Log FrSky Messages to SD
 
-#define READ_INPUTS
-
-//#define DEBUG_MEGA			//	Enables Serial0 Debugging. Only on MEGA640 and up
-//#define DEBUG_NAZA
-//#define DEBUG_FRSKY
-
+#define DEBUG_MEGA			//	Enables Serial0 Debugging. Only on MEGA640 and up
+#define DEBUG_OQL			//	Enables Debug OQL at Serial0
 /* FrSky Defines */
-
-//#define DEBUG_MEGA_FRSKY		//	Enables FrSky Framing Time debug
 
 //#define FRSKY_ACC				//	Eanbles sending accelerometer values
 //#define FRSKY_CELLS			//	Enables sending cells voltage
 //#define FRSKY_RPM				//	Enables sending RPM data
 //#define FRSKY_FUEL			//	Enables sending fuel
 //#define FRSKY_FRAME3			//	Enables FrSky Frame 3 (That sends only datetime)
+//#define READ_FRSKY_ALARMS		//	Enables reading FrSky Alarm Data.
+//#define READ_FRSKY_DATE		//	Enables reading Date From FrSky
+//#define READ_FRSKY_VI			//	Enables reading Voltage and Current from FrSky
+//#define READ_FRSKY_COURSE		//	Enables reading FrSky Course
 
-#define FRSKY_INTERVAL			50		//	50ms between checks
-#define GPS_WRITE_INTERVAL		250		//	250ms between gps writes
+#define FRSKY_INTERVAL			5		//	50ms between checks
+#define GPS_WRITE_INTERVAL		500		//	250ms between gps writes
 #define FRSKY_WRITE_INTERVAL	1000	//	1s between frsky writes
 
 template<class T> inline Print &operator <<(Print &obj, T arg) { obj.write(arg); return obj; }

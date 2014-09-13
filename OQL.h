@@ -16,10 +16,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Arduino.h>
-#include "config.h"
-#include "NazaGPS.h"
 #include "FrSky.h"
-
 
 #ifndef OQL_H
 #define OQL_H
@@ -36,7 +33,7 @@ private:
 	void PoolDigital();
 
 	static const int SD_SEL 	= 22;	//	SD Chip Select
-	static const String OQL_VER	= new String(OQL_VERSION);
+	static const String OQL_VER;
 	unsigned long lastFrSkyTime = 0;	//	Last time FrSky has been written
 	unsigned long lastGPSTime 	= 0;	//	Last time GPS has been written
 

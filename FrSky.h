@@ -11,11 +11,13 @@
 
 
 #include "config.h"
-#include "NazaGPS.h"
+#include <SPI.h>
+#include <SD.h>
 #include "DateTime.h"
 
 #ifndef FRSKY_H
 #define FRSKY_H
+
 
 #ifdef FRSKY_CELL
 	#define CELL_VMAX_C 159.f	//	The max value at variable
@@ -30,32 +32,24 @@ class FrSky	{
 private:
 
 	/**
-	 * Buffer for sending FrSky messages
-	 */
-	uint8_t buffer[128];
-
-	/**
 	 * Current Buffer Size (filled bytes)
 	 */
 	uint8_t buffsize		=	0;
 
 	/**
-	 * Last Frame 1 Time (millis)
+	 * Current HUB Buffer Size (filled bytes)
 	 */
-	uint32_t lastframe1		=	0;
-	/**
-	 * Last Frame 2 Time (millis)
-	 */
-	uint32_t lastframe2		=	0;
-	/**
-	 * Last Frame 3 Time (millis)
-	 */
-	uint32_t lastframe3		=	0;
+	uint8_t hubsize			=	0;
 
 	/**
 	 * Buffer for receiving FrSky Messages
 	 */
 	uint8_t inbuffer[12];
+
+	/**
+	 * Buffer for receiving FrSky HUB Messages
+	 */
+	uint8_t hubbuffer[4];
 
 	/**
 	 * Input Buffer Position
@@ -104,7 +98,7 @@ private:
 		HEADER		=	0x5E,
 		TAIL		=	0x5E,
 		ESCAPE		=	0x5D,
-		ALARM_HEAD	=	0x7E,
+		PACKET_HEAD	=	0x7E,
 		DECIMAL		=	0x08
 	};
 
@@ -241,6 +235,7 @@ public:
 
 
 	/** Alarms **/
+#ifdef READ_FRSKY_ALARMS
 	uint8_t A1T_1		=	0;			//	Alarm 1 - Analog Input 1 Threshold
 	uint8_t A1G_1		=	0;			//	Alarm 1 - Analog Input 1 Greater Than(1) or Lesser Than (2)
 	uint8_t A1L_1		=	0;			//	Alarm 1 - Analog Input 1 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
@@ -254,31 +249,43 @@ public:
 	uint8_t A2T_2		=	0;			//	Alarm 2 - Analog Input 2 Threshold
 	uint8_t A2G_2		=	0;			//	Alarm 2 - Analog Input 2 Greater Than(1) or Lesser Than (2)
 	uint8_t A2L_2		=	0;			//	Alarm 2 - Analog Input 2 Alarm Level. (0) Disable, (1) Yellow, (2) Orange, (3) Red
-
+#endif
 	FrSky()	{
-		// Lets set the current time to frames
-		lastframe1 = millis();
-		lastframe2 = millis()+50;
-		lastframe3 = millis()+100;
-		for(int i=0;i<128;i++)
-			buffer[i] = 0x00;
+		for(int i=0;i<12;i++)
+			inbuffer[i] = 0x00;
 	}
 
 	/**
-	 * Generates the FrSky String to logger
+	 * Writes FrSky GPS String
 	 */
+	void WriteFrskyGPSString(FastSerial &);
+	void WriteFrskyGPSString(SoftwareSerial &);
+	void WriteFrskyGPSString(const String &filename);
 
-	String GenerateFrSkyString();
 
 	/**
-	 * Generates FrSky GPS String to logger
+	 * Writes FrSky String
 	 */
-	String GenerateFrSkyGPSString();
+	void WriteFrskyString(FastSerial &);
+	void WriteFrskyString(SoftwareSerial &);
+	void WriteFrskyString(const String &filename);
 
 	/**
 	 * Checks if any frame needs to be sent
 	 */
 	void CheckData(SoftwareSerial &);
+
+	/**
+	 * Process an HUB Message
+	 */
+
+	void ProcessHUB(uint8_t);
+
+	/**
+	 * Process Hub Data
+	 */
+
+	void ProcessHUBData();
 
 	/**
 	 * Clears internal buffer
@@ -288,17 +295,17 @@ public:
 	/**
 	 * Returns the LSB from the current short
 	 */
-	static inline uint8_t lsb(uint16_t value)	{  return ((uint8_t) ((value) & 0xff));	}
+	static uint8_t lsb(uint16_t value)	{  return ((uint8_t) ((value) & 0xff));	}
 
 	/**
 	 * Returns the MSB from current short
 	 */
-	static inline uint8_t msb(uint16_t value)	{  return ((uint8_t) ((value) >> 8));	}
+	static uint8_t msb(uint16_t value)	{  return ((uint8_t) ((value) >> 8));	}
 
 	/**
 	 * Returns an uint16_t given MSB and LSB values
 	 */
-	static inline uint16_t To16(uint8_t msb, uint8_t lsb)	{
+	static uint16_t To16(uint8_t msb, uint8_t lsb)	{
 		return (((uint16_t)msb) << 8) + lsb;
 	}
 };

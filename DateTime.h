@@ -33,8 +33,13 @@ public:
 		year 	= 	date.year;
 	}
 	String ToString() {
-		uint8_t tmp[64];
-		sprintf((char *)tmp, "%02d/%02d/%02d-%02d:%02d:%02d\x00",year,month,day,hour,minute,seconds);
+		uint8_t tmp[20];
+		sprintf((char *)tmp, "%02d/%02d/%02d-%02d:%02d:%02d",year,month,day,hour,minute,seconds);
+		return String((char *)tmp);
+	}
+	String ToShortString()	{
+		uint8_t tmp[15];
+		sprintf((char *)tmp, "%02d%02d%02d%02d%02d%02d",year,month,day,hour,minute,seconds);
 		return String((char *)tmp);
 	}
 	uint8_t seconds;
