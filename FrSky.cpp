@@ -13,9 +13,34 @@
 
 void FrSky::WriteFrskyString(SoftwareSerial &ser)	{
 	static long ltime = 0;
-	char buff[80];
 	long delta = millis() - ltime;
 	ltime += delta;
+#ifdef LOG_BINARY
+	char *tmp;
+	ser.write(PSTART);
+	ser.write(0xFF);
+	ser.write(0xFF);
+	ser.write(FRSKY);
+	ser.write(time.year);
+	ser.write(time.month);
+	ser.write(time.day);
+	ser.write(time.hour);
+	ser.write(time.minute);
+	ser.write(time.seconds);
+
+	//	Decompose Delta LONG (4 bytes) and write it
+	tmp = (char *)(&delta);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+	ser.write(tmp[2]);
+	ser.write(tmp[3]);
+
+	ser.write(RSSI);
+	ser.write(A1);
+	ser.write(A2);
+	ser.write((uint8_t)0x00);
+
+#else
 	String tim = time.ToShortString();
 	ser.print("FRSKY:");
 	ser.print(tim);
@@ -27,13 +52,38 @@ void FrSky::WriteFrskyString(SoftwareSerial &ser)	{
 	ser.print(A1);
 	ser.print(":");
 	ser.println(A2);
+#endif
 }
 
 void FrSky::WriteFrskyString(FastSerial &ser)	{
 	static long ltime = 0;
-	char buff[80];
 	long delta = millis() - ltime;
 	ltime += delta;
+#ifdef LOG_BINARY
+	char *tmp;
+	ser.write(PSTART);
+	ser.write(0xFF);
+	ser.write(0xFF);
+	ser.write(FRSKY);
+	ser.write(time.year);
+	ser.write(time.month);
+	ser.write(time.day);
+	ser.write(time.hour);
+	ser.write(time.minute);
+	ser.write(time.seconds);
+
+	//	Decompose Delta LONG (4 bytes) and write it
+	tmp = (char *)(&delta);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+	ser.write(tmp[2]);
+	ser.write(tmp[3]);
+
+	ser.write(RSSI);
+	ser.write(A1);
+	ser.write(A2);
+	ser.write((uint8_t)0x00);
+#else
 	String tim = time.ToShortString();
 	ser.print("FRSKY:");
 	ser.print(tim);
@@ -45,6 +95,7 @@ void FrSky::WriteFrskyString(FastSerial &ser)	{
 	ser.print(A1);
 	ser.print(":");
 	ser.println(A2);
+#endif
 }
 
 void FrSky::WriteFrskyString(const String &filename)	{
@@ -55,6 +106,31 @@ void FrSky::WriteFrskyString(const String &filename)	{
 	String tim = time.ToShortString();
 	File dataFile = SD.open(filename.c_str(), FILE_WRITE);
 	if(dataFile)	{
+#ifdef LOG_BINARY
+		char *tmp;
+		dataFile.write(PSTART);
+		dataFile.write(0xFF);
+		dataFile.write(0xFF);
+		dataFile.write(FRSKY);
+		dataFile.write(time.year);
+		dataFile.write(time.month);
+		dataFile.write(time.day);
+		dataFile.write(time.hour);
+		dataFile.write(time.minute);
+		dataFile.write(time.seconds);
+
+		//	Decompose Delta LONG (4 bytes) and write it
+		tmp = (char *)(&delta);
+		dataFile.write(tmp[0]);
+		dataFile.write(tmp[1]);
+		dataFile.write(tmp[2]);
+		dataFile.write(tmp[3]);
+
+		dataFile.write(RSSI);
+		dataFile.write(A1);
+		dataFile.write(A2);
+		dataFile.write((uint8_t)0x00);
+#else
 		dataFile.print("FRSKY:");
 		dataFile.print(tim);
 		dataFile.print(":");
@@ -65,17 +141,64 @@ void FrSky::WriteFrskyString(const String &filename)	{
 		dataFile.print(A1);
 		dataFile.print(":");
 		dataFile.println(A2);
+#endif
 	}
 }
 
 void FrSky::WriteFrskyGPSString(SoftwareSerial &ser)	{
 	static long ltime = 0;
-	char buff[128];
 	long delta = millis() - ltime;
 	ltime += delta;
 	String tim = time.ToShortString();
 	uint8_t fix = (temperature2 / 10) > 3 ? 3 : (temperature2/10);
 	uint8_t sats = (uint8_t)(temperature2) - ((fix>0)?fix*10:0);
+#ifdef LOG_BINARY
+	char *tmp;
+	ser.write(PSTART);
+	ser.write(0xFF);
+	ser.write(0xFF);
+	ser.write(GPSDATA);
+	ser.write(time.year);
+	ser.write(time.month);
+	ser.write(time.day);
+	ser.write(time.hour);
+	ser.write(time.minute);
+	ser.write(time.seconds);
+
+	//	Decompose Delta LONG (4 bytes) and write it
+	tmp = (char *)(&delta);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+	ser.write(tmp[2]);
+	ser.write(tmp[3]);
+
+	tmp = (char *)(&latitude);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+	ser.write(tmp[2]);
+	ser.write(tmp[3]);
+
+	tmp = (char *)(&longitude);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+	ser.write(tmp[2]);
+	ser.write(tmp[3]);
+
+	tmp = (char *)(&altitude);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+
+	tmp = (char *)(&gps_altitude);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+	ser.write(tmp[2]);
+	ser.write(tmp[3]);
+
+	ser.write(fix);
+	ser.write(sats);
+	ser.write((uint8_t)0x00);
+
+#else
 	ser.print("GPS:");
 	ser.print(tim);
 	ser.print(":");
@@ -91,15 +214,61 @@ void FrSky::WriteFrskyGPSString(SoftwareSerial &ser)	{
 	ser.print(fix);
 	ser.print(":");
 	ser.println(sats);
+#endif
 }
 void FrSky::WriteFrskyGPSString(FastSerial &ser)	{
 	static long ltime = 0;
-	char buff[128];
 	long delta = millis() - ltime;
 	ltime += delta;
 	String tim = time.ToShortString();
 	uint8_t fix = (temperature2 / 10) > 3 ? 3 : (temperature2/10);
 	uint8_t sats = (uint8_t)(temperature2) - ((fix>0)?fix*10:0);
+#ifdef LOG_BINARY
+	char *tmp;
+	ser.write(PSTART);
+	ser.write(0xFF);
+	ser.write(0xFF);
+	ser.write(GPSDATA);
+	ser.write(time.year);
+	ser.write(time.month);
+	ser.write(time.day);
+	ser.write(time.hour);
+	ser.write(time.minute);
+	ser.write(time.seconds);
+
+	//	Decompose Delta LONG (4 bytes) and write it
+	tmp = (char *)(&delta);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+	ser.write(tmp[2]);
+	ser.write(tmp[3]);
+
+	tmp = (char *)(&latitude);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+	ser.write(tmp[2]);
+	ser.write(tmp[3]);
+
+	tmp = (char *)(&longitude);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+	ser.write(tmp[2]);
+	ser.write(tmp[3]);
+
+	tmp = (char *)(&altitude);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+
+	tmp = (char *)(&gps_altitude);
+	ser.write(tmp[0]);
+	ser.write(tmp[1]);
+	ser.write(tmp[2]);
+	ser.write(tmp[3]);
+
+	ser.write(fix);
+	ser.write(sats);
+	ser.write((uint8_t)0x00);
+#else
 	ser.print("GPS:");
 	ser.print(tim);
 	ser.print(":");
@@ -114,11 +283,11 @@ void FrSky::WriteFrskyGPSString(FastSerial &ser)	{
 	ser.print(fix);
 	ser.print(":");
 	ser.println(sats);
+#endif
 }
 
 void FrSky::WriteFrskyGPSString(const String &filename){
 	static long ltime = 0;
-	char buff[128];
 	long delta = millis() - ltime;
 	ltime += delta;
 	String tim = time.ToShortString();
@@ -126,6 +295,52 @@ void FrSky::WriteFrskyGPSString(const String &filename){
 	uint8_t sats = (uint8_t)(temperature2) - ((fix>0)?fix*10:0);
 	File dataFile = SD.open(filename.c_str(), FILE_WRITE);
 	if(dataFile)	{
+#ifdef LOG_BINARY
+		char *tmp;
+		dataFile.write(PSTART);
+		dataFile.write(0xFF);
+		dataFile.write(0xFF);
+		dataFile.write(GPSDATA);
+		dataFile.write(time.year);
+		dataFile.write(time.month);
+		dataFile.write(time.day);
+		dataFile.write(time.hour);
+		dataFile.write(time.minute);
+		dataFile.write(time.seconds);
+
+		//	Decompose Delta LONG (4 bytes) and write it
+		tmp = (char *)(&delta);
+		dataFile.write(tmp[0]);
+		dataFile.write(tmp[1]);
+		dataFile.write(tmp[2]);
+		dataFile.write(tmp[3]);
+
+		tmp = (char *)(&latitude);
+		dataFile.write(tmp[0]);
+		dataFile.write(tmp[1]);
+		dataFile.write(tmp[2]);
+		dataFile.write(tmp[3]);
+
+		tmp = (char *)(&longitude);
+		dataFile.write(tmp[0]);
+		dataFile.write(tmp[1]);
+		dataFile.write(tmp[2]);
+		dataFile.write(tmp[3]);
+
+		tmp = (char *)(&altitude);
+		dataFile.write(tmp[0]);
+		dataFile.write(tmp[1]);
+
+		tmp = (char *)(&gps_altitude);
+		dataFile.write(tmp[0]);
+		dataFile.write(tmp[1]);
+		dataFile.write(tmp[2]);
+		dataFile.write(tmp[3]);
+
+		dataFile.write(fix);
+		dataFile.write(sats);
+		dataFile.write((uint8_t)0x00);
+#else
 		dataFile.print("GPS:");
 		dataFile.print(latitude);
 		dataFile.print(",");
@@ -139,6 +354,7 @@ void FrSky::WriteFrskyGPSString(const String &filename){
 		dataFile.print(",");
 		dataFile.println(sats);
 		dataFile.close();
+#endif
 	}
 }
 

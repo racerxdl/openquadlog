@@ -61,6 +61,18 @@ private:
 	 */
 	uint8_t xornext			=	0;
 
+#ifdef LOG_BINARY
+	/**
+	 * The OQL Binary Protocol IDs
+	 */
+	enum BID	{
+		ERROR	=	0x00,
+		GPSDATA	=	0x01,
+		FRSKY	=	0x02,
+		PSTART	=	0xAF
+	};
+#endif
+
 	/**
 	 * The Message IDs from FrSky
 	 */
@@ -177,12 +189,14 @@ public:
 	 */
 	uint16_t rpm			=	0;		//	Motor RPM * Number of blades
 
+#ifdef FRSKY_FUEL
 	/**
 	 * Fuel Level
 	 *
 	 * Scale in percent (0% to 100%)
 	 */
 	uint16_t fuellevel		=	0;		//	Fuel Level (in percent)
+#endif
 
 	/**
 	 * Variometer Altitude
@@ -196,11 +210,12 @@ public:
 	 */
 	uint32_t gps_speed		=	0;		//	GPS Ground Speed (knots)
 
+#ifdef FRSKY_CELLS
     /**
      * 6 cells voltages. Multiplied by 100
      */
 	uint16_t cell[6]	    =	{0,0,0,0,0,0};
-
+#endif
 	/**
 	 * GPS Course
 	 *
@@ -213,6 +228,7 @@ public:
 	 */
 	DateTime time;						//	GPS Time
 
+#ifdef READ_FRSKY_VI
 	/**
 	 * Battery Voltage
 	 *
@@ -226,13 +242,14 @@ public:
 	 * Multiplied by 10
 	 */
 	uint16_t current		=	0;
-
+#endif
+#ifdef FRSKY_ACC
 	/**
 	 * Acelerometer
 	 * An 16 bit 3 component array corresponding X,Y,Z raw values from accelerometer.
 	 */
 	uint16_t acc[3]			=	{0,0,0};//	Acelerometer Values
-
+#endif
 
 	/** Alarms **/
 #ifdef READ_FRSKY_ALARMS
@@ -290,7 +307,7 @@ public:
 	/**
 	 * Clears internal buffer
 	 */
-	inline void ClearBuffer();
+	void ClearBuffer();
 
 	/**
 	 * Returns the LSB from the current short

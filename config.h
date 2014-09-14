@@ -37,24 +37,26 @@
 #ifndef OQLDEFS
 #define OQLDEFS
 
-#define MEGA_MODE			//	Test the sketch on Arduino Mega
+#define MEGA_MODE						//	Test the sketch on Arduino Mega
 
-#define USE_SD				//	Use data logging to SD
-#define LOG_FRSKY			//	Log FrSky Messages to SD
+#define USE_SD							//	Use data logging to SD
+#define LOG_FRSKY						//	Log FrSky Messages to SD
 
-#define DEBUG_MEGA			//	Enables Serial0 Debugging. Only on MEGA640 and up
-#define DEBUG_OQL			//	Enables Debug OQL at Serial0
+#define DEBUG_MEGA						//	Enables Serial0 Debugging. Only on MEGA640 and up
+#define DEBUG_OQL						//	Enables Debug OQL at Serial0
 /* FrSky Defines */
 
-//#define FRSKY_ACC				//	Eanbles sending accelerometer values
-//#define FRSKY_CELLS			//	Enables sending cells voltage
-//#define FRSKY_RPM				//	Enables sending RPM data
-//#define FRSKY_FUEL			//	Enables sending fuel
-//#define FRSKY_FRAME3			//	Enables FrSky Frame 3 (That sends only datetime)
-//#define READ_FRSKY_ALARMS		//	Enables reading FrSky Alarm Data.
-//#define READ_FRSKY_DATE		//	Enables reading Date From FrSky
-//#define READ_FRSKY_VI			//	Enables reading Voltage and Current from FrSky
-//#define READ_FRSKY_COURSE		//	Enables reading FrSky Course
+#define LOG_BINARY						//	Log as binary format instead text
+
+//#define FRSKY_ACC						//	Eanbles sending accelerometer values
+//#define FRSKY_CELLS					//	Enables sending cells voltage
+//#define FRSKY_RPM						//	Enables sending RPM data
+//#define FRSKY_FUEL					//	Enables sending fuel
+//#define FRSKY_FRAME3					//	Enables FrSky Frame 3 (That sends only datetime)
+//#define READ_FRSKY_ALARMS				//	Enables reading FrSky Alarm Data.
+//#define READ_FRSKY_DATE				//	Enables reading Date From FrSky
+//#define READ_FRSKY_VI					//	Enables reading Voltage and Current from FrSky
+//#define READ_FRSKY_COURSE				//	Enables reading FrSky Course
 
 #define FRSKY_INTERVAL			5		//	50ms between checks
 #define GPS_WRITE_INTERVAL		500		//	250ms between gps writes
